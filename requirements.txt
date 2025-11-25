@@ -5,14 +5,15 @@ Django==4.2.26
 python-decouple==3.8
 
 # ========================================
-# BASE DE DONNÉES
+# BASE DE DONNÉES (Production - PostgreSQL)
 # ========================================
-# Windows : mysql-connector-python (compatible avec ENGINE='mysql.connector.django')
-mysql-connector-python==8.1.0
+psycopg2-binary==2.9.9
+dj-database-url==2.1.0
 
-# Linux/Mac : mysqlclient (plus performant, mais nécessite MySQL dev libs)
-# Décommenter si vous déployez sur Linux :
-# mysqlclient==2.2.0
+# ========================================
+# BASE DE DONNÉES (Développement Windows - MySQL)
+# ========================================
+mysqlclient==2.2.7
 
 # ========================================
 # SERVING STATIC FILES (PRODUCTION)
@@ -20,13 +21,9 @@ mysql-connector-python==8.1.0
 whitenoise==6.6.0
 
 # ========================================
-# SERVEURS WSGI
+# SERVEUR WSGI (PRODUCTION)
 # ========================================
-# Windows : Waitress
-waitress==2.1.2
-
-# Linux/Mac : Gunicorn (décommenter pour déploiement Linux)
-# gunicorn==21.2.0
+gunicorn==21.2.0
 
 # ========================================
 # FORMS & UI
@@ -44,16 +41,4 @@ reportlab==4.1.0
 # SECURITY & UTILITIES
 # ========================================
 defusedxml==0.7.1
-python-stdnum==1.19
-
-# ========================================
-# CACHE & PERFORMANCE (Optionnel - Production)
-# ========================================
-# Décommenter si vous utilisez Redis en production :
-# redis==5.0.1
-# django-redis==5.4.0
-
-# ========================================
-# MONITORING (Optionnel - Production)
-# ========================================
-# sentry-sdk==1.39.1  # Pour tracking des erreurs
+python-stdnum==1.19.0
