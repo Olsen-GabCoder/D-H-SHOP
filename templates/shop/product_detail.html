@@ -1,0 +1,1387 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | {{ block.super }}{% endblock %}
+
+{% block meta_description %}{{ product.short_description|default:product.meta_description|default:product.description|truncatewords:20 }}{% endblock %}
+
+<!-- ========================================
+     META TAGS POUR SEO ET PARTAGE SOCIAL
+     ======================================== -->
+{% block extra_meta %}
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="product">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:title" content="{{ product.name }}">
+<meta property="og:description" content="{{ product.short_description|default:product.description|truncatewords:20 }}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}">
+<meta property="product:price:amount" content="{{ product.current_price }}">
+<meta property="product:price:currency" content="XAF">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ product.name }}">
+<meta name="twitter:description" content="{{ product.short_description|default:product.description|truncatewords:20 }}">
+<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}">
+
+<!-- Schema.org Product Markup -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name }}",
+  "image": [
+    "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}"
+    {% for image in additional_images %}
+    ,"{{ request.scheme }}://{{ request.get_host }}{{ image.image.url }}"
+    {% endfor %}
+  ],
+  "description": "{{ product.description|striptags|truncatewords:50 }}",
+  "sku": "{{ variants.first.sku|default:product.slug }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "Votre Marque"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "XAF",
+    "price": "{{ product.current_price }}",
+    {% if product.has_discount %}
+    "priceValidUntil": "{{ product.updated_at|date:'Y-m-d' }}",
+    {% endif %}
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+  {% if product.views_count > 0 %}
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4",
+    "reviewCount": "{{ product.views_count }}"
+  }
+  {% endif %}
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product-detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     BREADCRUMB MODERNE
+     ======================================== -->
+<section class="breadcrumb-modern">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb-custom">
+                <li class="breadcrumb-item-custom">
+                    <a href="{% url 'core:home' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <a href="{% url 'shop:product_list' %}">
+                        <i class="fas fa-store"></i>
+                        <span>Boutique</span>
+                    </a>
+                </li>
+                {% if product.category.parent %}
+                <li class="breadcrumb-item-custom">
+                    <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <a href="{% url 'shop:category_detail' product.category.parent.slug %}">
+                        {{ product.category.parent.name }}
+                    </a>
+                </li>
+                {% endif %}
+                <li class="breadcrumb-item-custom">
+                    <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <a href="{% url 'shop:category_detail' product.category.slug %}">
+                        {{ product.category.name }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                </li>
+                <li class="breadcrumb-item-custom active" aria-current="page">
+                    <span>{{ product.name|truncatewords:5 }}</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- ========================================
+     SECTION PRINCIPALE DU PRODUIT
+     ======================================== -->
+<section class="product-detail-section">
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- ========================================
+                 GALERIE D'IMAGES MODERNE
+                 ======================================== -->
+            <div class="col-lg-6">
+                <div class="product-gallery-modern">
+                    
+                    <!-- Image principale avec zoom -->
+                    <div class="main-image-container">
+                        
+                        <!-- Badges promotionnels -->
+                        <div class="product-badges">
+                            {% if product.has_discount %}
+                            <span class="product-badge-modern badge-sale" 
+                                  title="Économisez {{ product.discount_percentage }}%">
+                                <i class="fas fa-tag"></i>
+                                -{{ product.discount_percentage }}%
+                            </span>
+                            {% endif %}
+                            
+                            {% if product.is_new %}
+                            <span class="product-badge-modern badge-new" 
+                                  title="Nouveau produit">
+                                <i class="fas fa-sparkles"></i>
+                                Nouveau
+                            </span>
+                            {% endif %}
+                            
+                            {% if product.is_featured %}
+                            <span class="product-badge-modern badge-featured" 
+                                  title="Produit phare">
+                                <i class="fas fa-star"></i>
+                                Top Vente
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Image principale -->
+                        <div class="main-image-wrapper">
+                            <img id="main-product-image" 
+                                 src="{{ product.main_image.url }}" 
+                                 alt="{{ product.name }}"
+                                 width="600"
+                                 height="600"
+                                 class="main-product-image"
+                                 loading="eager"
+                                 itemprop="image">
+                            
+                            <!-- Compteur d'images -->
+                            {% if additional_images %}
+                            <div class="image-counter">
+                                <i class="fas fa-images"></i>
+                                <span id="current-image-index">1</span> / <span id="total-images">{{ additional_images|length|add:1 }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Bouton de zoom -->
+                        <button class="image-zoom-btn" 
+                                type="button"
+                                title="Zoom sur l'image"
+                                aria-label="Agrandir l'image">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Vignettes avec navigation -->
+                    {% if additional_images %}
+                    <div class="thumbnails-container">
+                        <button class="thumbnail-nav-btn thumbnail-prev" 
+                                type="button"
+                                disabled
+                                aria-label="Images précédentes">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="thumbnails-wrapper">
+                            <div class="thumbnails-track">
+                                <!-- Vignette de l'image principale -->
+                                <div class="thumbnail-item">
+                                    <img src="{{ product.main_image.url }}" 
+                                         data-image="{{ product.main_image.url }}"
+                                         data-index="1"
+                                         class="thumbnail-image active" 
+                                         alt="{{ product.name }}"
+                                         width="80"
+                                         height="80"
+                                         loading="lazy">
+                                </div>
+                                
+                                <!-- Vignettes additionnelles -->
+                                {% for image in additional_images %}
+                                <div class="thumbnail-item">
+                                    <img src="{{ image.image.url }}" 
+                                         data-image="{{ image.image.url }}"
+                                         data-index="{{ forloop.counter|add:1 }}"
+                                         class="thumbnail-image" 
+                                         alt="{{ image.alt_text|default:product.name }}"
+                                         width="80"
+                                         height="80"
+                                         loading="lazy">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <button class="thumbnail-nav-btn thumbnail-next" 
+                                type="button"
+                                aria-label="Images suivantes">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+
+            <!-- ========================================
+                 INFORMATIONS PRODUIT MODERNE
+                 ======================================== -->
+            <div class="col-lg-6">
+                <div class="product-info-modern">
+                    
+                    <!-- Catégorie -->
+                    <div class="product-category-badge">
+                        <a href="{% url 'shop:category_detail' product.category.slug %}">
+                            <i class="fas fa-tag"></i>
+                            {{ product.category.name }}
+                        </a>
+                    </div>
+                    
+                    <!-- Titre du produit -->
+                    <h1 class="product-title-detail" itemprop="name">
+                        {{ product.name }}
+                    </h1>
+                    
+                    <!-- Notation et avis -->
+                    <div class="product-rating-detail" 
+                         itemprop="aggregateRating" 
+                         itemscope 
+                         itemtype="https://schema.org/AggregateRating">
+                        <div class="stars" aria-label="Note : 4 sur 5">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-text">
+                            <span itemprop="ratingValue" content="4">4.0</span>
+                            (<span itemprop="reviewCount">{{ product.views_count }}</span> avis)
+                        </span>
+                        <span class="rating-separator">•</span>
+                        <a href="#reviews-section" class="add-review-link">
+                            <i class="fas fa-pen"></i>
+                            Ajouter un avis
+                        </a>
+                    </div>
+
+                    <!-- Prix avec promotion -->
+                    <div class="product-price-detail" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <div class="price-container">
+                            <span id="product-price" 
+                                  class="price-current" 
+                                  itemprop="price" 
+                                  content="{{ product.current_price }}">
+                                {{ product.current_price|floatformat:0 }}
+                            </span>
+                            <span class="price-currency" itemprop="priceCurrency" content="XAF">
+                                FCFA
+                            </span>
+                            
+                            {% if product.has_discount %}
+                            <span class="price-old" aria-label="Prix original">
+                                {{ product.base_price|floatformat:0 }} FCFA
+                            </span>
+                            <span class="price-save">
+                                <i class="fas fa-tags"></i>
+                                Économisez {{ product.discount_percentage }}% ({{ product.base_price|floatformat:0|add:"-"|add:product.current_price|floatformat:0 }} FCFA)
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <meta itemprop="availability" content="https://schema.org/InStock">
+                        <meta itemprop="url" content="{{ request.build_absolute_uri }}">
+                    </div>
+
+                    <!-- Description courte -->
+                    {% if product.short_description %}
+                    <div class="product-short-description" itemprop="description">
+                        <p>{{ product.short_description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="divider-modern"></div>
+
+                    <!-- ========================================
+                         FORMULAIRE D'AJOUT AU PANIER
+                         ======================================== -->
+                    {% if variants %}
+                    <form method="post" 
+                          action="{% url 'orders:cart_add' variants.first.id %}" 
+                          class="add-to-cart-form" 
+                          id="add-to-cart-form"
+                          novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- ========================================
+                             SÉLECTION DES VARIANTES
+                             ======================================== -->
+                        <div class="product-options-modern">
+                            <label class="option-label" for="variant-selection">
+                                <i class="fas fa-ruler-combined"></i>
+                                Sélectionnez une taille
+                                {% if variants|length > 1 %}
+                                <a href="#" 
+                                   class="size-guide-link" 
+                                   data-bs-toggle="modal" 
+                                   data-bs-target="#sizeGuideModal">
+                                    <i class="fas fa-question-circle"></i>
+                                    Guide des tailles
+                                </a>
+                                {% endif %}
+                            </label>
+                            
+                            <div class="variant-buttons-group" 
+                                 id="variant-selection" 
+                                 role="radiogroup" 
+                                 aria-label="Sélection de la taille">
+                                {% for variant in variants %}
+                                <button type="button" 
+                                        class="variant-btn-modern {% if forloop.first %}active{% endif %} {% if not variant.stock.is_in_stock %}out-of-stock{% endif %}"
+                                        data-variant-id="{{ variant.id }}"
+                                        data-price="{{ variant.final_price }}"
+                                        data-stock="{{ variant.stock.available_quantity }}"
+                                        data-size="{{ variant.size }}"
+                                        {% if variant.color %}data-color="{{ variant.color }}"{% endif %}
+                                        {% if not variant.stock.is_in_stock %}disabled{% endif %}
+                                        role="radio"
+                                        aria-checked="{% if forloop.first %}true{% else %}false{% endif %}"
+                                        aria-label="Taille {{ variant.size }}">
+                                    <span class="variant-size">{{ variant.size }}</span>
+                                    {% if not variant.stock.is_in_stock %}
+                                    <span class="variant-stock-badge out">
+                                        <i class="fas fa-times"></i>
+                                        Rupture
+                                    </span>
+                                    {% elif variant.stock.is_low_stock %}
+                                    <span class="variant-stock-badge low">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {{ variant.stock.available_quantity }} restant{{ variant.stock.available_quantity|pluralize }}
+                                    </span>
+                                    {% endif %}
+                                </button>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Indicateur de stock pour la variante sélectionnée -->
+                            <div class="stock-indicator" id="stock-indicator">
+                                {% with first_variant=variants.first %}
+                                {% if first_variant.stock.is_in_stock %}
+                                    {% if first_variant.stock.is_low_stock %}
+                                    <span class="stock-status stock-low">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Plus que {{ first_variant.stock.available_quantity }} en stock !
+                                    </span>
+                                    {% else %}
+                                    <span class="stock-status stock-in">
+                                        <i class="fas fa-check-circle"></i>
+                                        En stock ({{ first_variant.stock.available_quantity }} disponible{{ first_variant.stock.available_quantity|pluralize }})
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="stock-status stock-out">
+                                    <i class="fas fa-times-circle"></i>
+                                    Rupture de stock
+                                </span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+
+                        <!-- ========================================
+                             CONTRÔLES DE QUANTITÉ
+                             ======================================== -->
+                        <div class="product-options-modern">
+                            <label class="option-label" for="quantity">
+                                <i class="fas fa-shopping-basket"></i>
+                                Quantité
+                            </label>
+                            
+                            <div class="quantity-controls-modern">
+                                <button class="quantity-btn quantity-decrement" 
+                                        type="button"
+                                        aria-label="Diminuer la quantité">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                
+                                <input type="number" 
+                                       name="quantity" 
+                                       id="quantity" 
+                                       class="quantity-input-modern" 
+                                       value="1" 
+                                       min="1" 
+                                       max="{{ variants.first.stock.available_quantity }}"
+                                       aria-label="Quantité"
+                                       required>
+                                
+                                <button class="quantity-btn quantity-increment" 
+                                        type="button"
+                                        aria-label="Augmenter la quantité">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ========================================
+                             BOUTONS D'ACTION
+                             ======================================== -->
+                        <div class="product-actions-detail">
+                            <button type="submit" 
+                                    class="btn-add-to-cart-modern"
+                                    {% if not variants.first.stock.is_in_stock %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Ajouter au panier</span>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="btn-wishlist-modern" 
+                                    title="Ajouter aux favoris"
+                                    aria-label="Ajouter aux favoris"
+                                    data-product-id="{{ product.id }}">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="btn-compare-modern" 
+                                    title="Comparer"
+                                    aria-label="Ajouter à la comparaison"
+                                    data-product-id="{{ product.id }}">
+                                <i class="fas fa-balance-scale"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <!-- Message si aucune variante disponible -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Produit indisponible</strong>
+                        <p>Ce produit n'a actuellement aucune variante disponible. Veuillez réessayer plus tard.</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="divider-modern"></div>
+
+                    <!-- ========================================
+                         MÉTA-INFORMATIONS DU PRODUIT
+                         ======================================== -->
+                    <div class="product-meta-modern">
+                        {% if variants.first %}
+                        <div class="meta-item">
+                            <i class="fas fa-barcode"></i>
+                            <span class="meta-label">SKU:</span>
+                            <span class="meta-value">{{ variants.first.sku|default:product.slug|upper }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="meta-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="meta-label">Disponibilité:</span>
+                            {% if variants.first.stock.is_in_stock %}
+                            <span class="meta-value stock-status-in">
+                                <i class="fas fa-check"></i>
+                                En stock
+                            </span>
+                            {% else %}
+                            <span class="meta-value stock-status-out">
+                                <i class="fas fa-times"></i>
+                                Rupture de stock
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="meta-item">
+                            <i class="fas fa-truck"></i>
+                            <span class="meta-label">Livraison:</span>
+                            <span class="meta-value">2-3 jours ouvrables</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span class="meta-label">Vues:</span>
+                            <span class="meta-value">{{ product.views_count }} fois</span>
+                        </div>
+                        
+                        {% if product.sales_count > 0 %}
+                        <div class="meta-item">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span class="meta-label">Vendus:</span>
+                            <span class="meta-value">{{ product.sales_count }} unité{{ product.sales_count|pluralize }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ========================================
+                         BADGES DE CONFIANCE
+                         ======================================== -->
+                    <div class="product-features-modern">
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Garantie 100% authentique</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-undo"></i>
+                            <span>Retour gratuit sous 30 jours</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-lock"></i>
+                            <span>Paiement sécurisé</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-headset"></i>
+                            <span>Support client 24/7</span>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         PARTAGE SOCIAL
+                         ======================================== -->
+                    <div class="product-share-modern">
+                        <span class="share-label">
+                            <i class="fas fa-share-alt"></i>
+                            Partager:
+                        </span>
+                        <div class="share-buttons">
+                            <a href="#" 
+                               class="share-btn share-facebook" 
+                               title="Partager sur Facebook"
+                               aria-label="Partager sur Facebook"
+                               data-share="facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" 
+                               class="share-btn share-twitter" 
+                               title="Partager sur Twitter"
+                               aria-label="Partager sur Twitter"
+                               data-share="twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" 
+                               class="share-btn share-whatsapp" 
+                               title="Partager sur WhatsApp"
+                               aria-label="Partager sur WhatsApp"
+                               data-share="whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="#" 
+                               class="share-btn share-pinterest" 
+                               title="Épingler sur Pinterest"
+                               aria-label="Épingler sur Pinterest"
+                               data-share="pinterest">
+                                <i class="fab fa-pinterest-p"></i>
+                            </a>
+                            <button type="button"
+                                    class="share-btn share-copy" 
+                                    title="Copier le lien"
+                                    aria-label="Copier le lien"
+                                    data-share="copy">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     SECTION DES DÉTAILS (ONGLETS)
+     ======================================== -->
+<section class="product-tabs-section">
+    <div class="container">
+        <div class="tabs-modern-wrapper">
+            
+            <!-- Navigation des onglets -->
+            <ul class="tabs-modern-nav" role="tablist">
+                <li class="tab-modern-item" role="presentation">
+                    <button class="tab-modern-link active" 
+                            data-tab="description" 
+                            role="tab" 
+                            aria-selected="true"
+                            aria-controls="description"
+                            id="tab-description">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Description</span>
+                    </button>
+                </li>
+                <li class="tab-modern-item" role="presentation">
+                    <button class="tab-modern-link" 
+                            data-tab="specs" 
+                            role="tab" 
+                            aria-selected="false"
+                            aria-controls="specs"
+                            id="tab-specs">
+                        <i class="fas fa-list-ul"></i>
+                        <span>Spécifications</span>
+                    </button>
+                </li>
+                <li class="tab-modern-item" role="presentation">
+                    <button class="tab-modern-link" 
+                            data-tab="reviews" 
+                            role="tab" 
+                            aria-selected="false"
+                            aria-controls="reviews"
+                            id="tab-reviews">
+                        <i class="fas fa-star"></i>
+                        <span>Avis Clients</span>
+                        <span class="tab-badge">{{ product.views_count|default:0 }}</span>
+                    </button>
+                </li>
+                <li class="tab-modern-item" role="presentation">
+                    <button class="tab-modern-link" 
+                            data-tab="shipping" 
+                            role="tab" 
+                            aria-selected="false"
+                            aria-controls="shipping"
+                            id="tab-shipping">
+                        <i class="fas fa-shipping-fast"></i>
+                        <span>Livraison</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Contenu des onglets -->
+            <div class="tabs-modern-content">
+                
+                <!-- ========================================
+                     ONGLET DESCRIPTION
+                     ======================================== -->
+                <div class="tab-modern-pane active" 
+                     id="description" 
+                     role="tabpanel"
+                     aria-labelledby="tab-description">
+                    <div class="tab-content-wrapper">
+                        <h3 class="tab-content-title">
+                            <i class="fas fa-info-circle"></i>
+                            Description du produit
+                        </h3>
+                        <div class="description-content">
+                            {{ product.description|safe }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================
+                     ONGLET SPÉCIFICATIONS
+                     ======================================== -->
+                <div class="tab-modern-pane" 
+                     id="specs" 
+                     role="tabpanel"
+                     aria-labelledby="tab-specs">
+                    <div class="tab-content-wrapper">
+                        <h3 class="tab-content-title">
+                            <i class="fas fa-clipboard-list"></i>
+                            Spécifications techniques
+                        </h3>
+                        <div class="specs-table-modern">
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-tag"></i>
+                                    Catégorie
+                                </div>
+                                <div class="spec-value">
+                                    <a href="{% url 'shop:category_detail' product.category.slug %}">
+                                        {{ product.category.name }}
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            {% if variants.first %}
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-barcode"></i>
+                                    SKU
+                                </div>
+                                <div class="spec-value">{{ variants.first.sku|default:product.slug|upper }}</div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-boxes"></i>
+                                    Disponibilité
+                                </div>
+                                <div class="spec-value">
+                                    {% if variants.first.stock.is_in_stock %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i>
+                                        En stock
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times"></i>
+                                        Rupture de stock
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if variants %}
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-ruler-combined"></i>
+                                    Tailles disponibles
+                                </div>
+                                <div class="spec-value">
+                                    {% for variant in variants %}
+                                        {{ variant.size }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-certificate"></i>
+                                    Marque
+                                </div>
+                                <div class="spec-value">Votre Marque</div>
+                            </div>
+                            
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Date d'ajout
+                                </div>
+                                <div class="spec-value">{{ product.created_at|date:"d/m/Y" }}</div>
+                            </div>
+                            
+                            {% if product.updated_at != product.created_at %}
+                            <div class="spec-row">
+                                <div class="spec-label">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Dernière mise à jour
+                                </div>
+                                <div class="spec-value">{{ product.updated_at|date:"d/m/Y" }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================
+                     ONGLET AVIS CLIENTS
+                     ======================================== -->
+                <div class="tab-modern-pane" 
+                     id="reviews" 
+                     role="tabpanel"
+                     aria-labelledby="tab-reviews">
+                    <div class="tab-content-wrapper">
+                        <h3 class="tab-content-title">
+                            <i class="fas fa-comments"></i>
+                            Avis clients
+                        </h3>
+                        
+                        <!-- Résumé des avis -->
+                        <div class="reviews-summary">
+                            <div class="reviews-summary-score">
+                                <div class="score-number">4.0</div>
+                                <div class="score-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <div class="score-text">Basé sur {{ product.views_count }} avis</div>
+                            </div>
+                            
+                            <div class="reviews-summary-bars">
+                                <div class="review-bar-item">
+                                    <span class="bar-label">5 étoiles</span>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" style="width: 60%"></div>
+                                    </div>
+                                    <span class="bar-count">60%</span>
+                                </div>
+                                <div class="review-bar-item">
+                                    <span class="bar-label">4 étoiles</span>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" style="width: 25%"></div>
+                                    </div>
+                                    <span class="bar-count">25%</span>
+                                </div>
+                                <div class="review-bar-item">
+                                    <span class="bar-label">3 étoiles</span>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" style="width: 10%"></div>
+                                    </div>
+                                    <span class="bar-count">10%</span>
+                                </div>
+                                <div class="review-bar-item">
+                                    <span class="bar-label">2 étoiles</span>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" style="width: 3%"></div>
+                                    </div>
+                                    <span class="bar-count">3%</span>
+                                </div>
+                                <div class="review-bar-item">
+                                    <span class="bar-label">1 étoile</span>
+                                    <div class="bar-container">
+                                        <div class="bar-fill" style="width: 2%"></div>
+                                    </div>
+                                    <span class="bar-count">2%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Conteneur des avis -->
+                        <div class="reviews-container-modern">
+                            <!-- Message si aucun avis (à remplacer par vraie liste) -->
+                            <div class="no-reviews-message">
+                                <div class="no-reviews-icon">
+                                    <i class="fas fa-comment-slash"></i>
+                                </div>
+                                <h4>Aucun avis pour le moment</h4>
+                                <p>Soyez le premier à donner votre avis sur ce produit et aidez les autres clients dans leur choix.</p>
+                                <button type="button" 
+                                        class="btn-write-review"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#reviewModal">
+                                    <i class="fas fa-pen"></i>
+                                    <span>Écrire un avis</span>
+                                </button>
+                            </div>
+                            
+                            <!-- STRUCTURE POUR FUTURS AVIS (à décommenter quand le modèle Review existe) -->
+                            <!--
+                            {% for review in reviews %}
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <div class="author-avatar">
+                                            {{ review.author.first_name|first }}{{ review.author.last_name|first }}
+                                        </div>
+                                        <div class="author-info">
+                                            <strong class="author-name">{{ review.author.get_full_name }}</strong>
+                                            {% if review.verified_purchase %}
+                                            <span class="verified-badge">
+                                                <i class="fas fa-check-circle"></i>
+                                                Achat vérifié
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="review-meta">
+                                        <div class="review-stars">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star"></i>
+                                                {% else %}
+                                                <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <time class="review-date" datetime="{{ review.created_at|date:'Y-m-d' }}">
+                                            {{ review.created_at|date:"d/m/Y" }}
+                                        </time>
+                                    </div>
+                                </div>
+                                <div class="review-body">
+                                    <p>{{ review.comment }}</p>
+                                </div>
+                                <div class="review-footer">
+                                    <button type="button" class="review-helpful-btn">
+                                        <i class="far fa-thumbs-up"></i>
+                                        Utile ({{ review.helpful_count }})
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="no-reviews-message">...</div>
+                            {% endfor %}
+                            -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================
+                     ONGLET LIVRAISON
+                     ======================================== -->
+                <div class="tab-modern-pane" 
+                     id="shipping" 
+                     role="tabpanel"
+                     aria-labelledby="tab-shipping">
+                    <div class="tab-content-wrapper">
+                        <h3 class="tab-content-title">
+                            <i class="fas fa-truck"></i>
+                            Informations de livraison
+                        </h3>
+                        
+                        <div class="shipping-info-grid">
+                            <div class="shipping-card">
+                                <div class="shipping-icon">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <h4>Livraison Standard</h4>
+                                <p class="shipping-time">2-5 jours ouvrables</p>
+                                <p class="shipping-price">Frais variables selon la zone</p>
+                                <ul class="shipping-features">
+                                    <li><i class="fas fa-check"></i> Suivi de commande</li>
+                                    <li><i class="fas fa-check"></i> Livraison à domicile</li>
+                                    <li><i class="fas fa-check"></i> Paiement à la livraison</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="shipping-card featured">
+                                <div class="shipping-badge">Recommandé</div>
+                                <div class="shipping-icon">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h4>Livraison Express</h4>
+                                <p class="shipping-time">1-2 jours ouvrables</p>
+                                <p class="shipping-price">Frais supplémentaires appliqués</p>
+                                <ul class="shipping-features">
+                                    <li><i class="fas fa-check"></i> Livraison prioritaire</li>
+                                    <li><i class="fas fa-check"></i> Suivi en temps réel</li>
+                                    <li><i class="fas fa-check"></i> Notification SMS</li>
+                                    <li><i class="fas fa-check"></i> Créneau horaire au choix</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="shipping-zones">
+                            <h4>
+                                <i class="fas fa-map-marked-alt"></i>
+                                Zones de livraison
+                            </h4>
+                            <div class="zones-grid">
+                                <div class="zone-item">
+                                    <i class="fas fa-map-pin"></i>
+                                    <strong>Libreville</strong>
+                                    <span>Livraison gratuite dès 50 000 FCFA</span>
+                                </div>
+                                <div class="zone-item">
+                                    <i class="fas fa-map-pin"></i>
+                                    <strong>Owendo & Akanda</strong>
+                                    <span>Livraison sous 3 jours</span>
+                                </div>
+                                <div class="zone-item">
+                                    <i class="fas fa-map-pin"></i>
+                                    <strong>Port-Gentil</strong>
+                                    <span>Livraison sous 5 jours</span>
+                                </div>
+                                <div class="zone-item">
+                                    <i class="fas fa-map-pin"></i>
+                                    <strong>Autres villes</strong>
+                                    <span>Nous consulter</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="shipping-policies">
+                            <h4>
+                                <i class="fas fa-shield-alt"></i>
+                                Politique de retour
+                            </h4>
+                            <ul>
+                                <li>
+                                    <i class="fas fa-undo"></i>
+                                    <strong>Retour gratuit sous 30 jours</strong> - Pas satisfait ? Retournez votre produit gratuitement.
+                                </li>
+                                <li>
+                                    <i class="fas fa-exchange-alt"></i>
+                                    <strong>Échange facile</strong> - Changez de taille ou de couleur sans frais supplémentaires.
+                                </li>
+                                <li>
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <strong>Remboursement rapide</strong> - Recevez votre remboursement sous 7 jours ouvrables.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     PRODUITS SIMILAIRES
+     ======================================== -->
+{% if related_products %}
+<section class="related-products-section">
+    <div class="container">
+        <div class="section-header-modern">
+            <h2 class="section-title-modern">
+                <span class="title-icon">
+                    <i class="fas fa-heart"></i>
+                </span>
+                Vous aimerez aussi
+            </h2>
+            <p class="section-subtitle-modern">
+                Découvrez d'autres produits similaires sélectionnés pour vous
+            </p>
+        </div>
+
+        <div class="related-products-grid">
+            {% for related_product in related_products %}
+            <div class="product-card-modern" data-product-id="{{ related_product.id }}">
+                <div class="product-image-container">
+                    <!-- Badges -->
+                    {% if related_product.has_discount %}
+                    <span class="product-badge-modern badge-sale">
+                        <i class="fas fa-tag"></i>
+                        -{{ related_product.discount_percentage }}%
+                    </span>
+                    {% elif related_product.is_new %}
+                    <span class="product-badge-modern badge-new">
+                        <i class="fas fa-sparkles"></i>
+                        Nouveau
+                    </span>
+                    {% endif %}
+                    
+                    <!-- Image -->
+                    <a href="{% url 'shop:product_detail' related_product.slug %}" class="product-link">
+                        <div class="product-image-wrapper">
+                            <img src="{{ related_product.main_image.url }}" 
+                                 alt="{{ related_product.name }}"
+                                 width="300"
+                                 height="300"
+                                 class="product-image"
+                                 loading="lazy">
+                        </div>
+                        
+                        <!-- Actions au survol -->
+                        <div class="product-overlay-modern">
+                            <div class="overlay-actions">
+                                <button type="button"
+                                        class="overlay-action-btn quick-view-btn" 
+                                        title="Aperçu rapide"
+                                        data-product-id="{{ related_product.id }}"
+                                        data-product-slug="{{ related_product.slug }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button"
+                                        class="overlay-action-btn add-to-cart-quick" 
+                                        title="Ajouter au panier"
+                                        data-product-id="{{ related_product.id }}">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                                <button type="button"
+                                        class="overlay-action-btn add-to-wishlist" 
+                                        title="Ajouter aux favoris"
+                                        data-product-id="{{ related_product.id }}">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Informations du produit -->
+                <div class="product-content-modern">
+                    <div class="product-category-modern">
+                        <a href="{% url 'shop:category_detail' related_product.category.slug %}">
+                            <i class="fas fa-tag"></i>
+                            {{ related_product.category.name }}
+                        </a>
+                    </div>
+                    
+                    <h3 class="product-title-modern">
+                        <a href="{% url 'shop:product_detail' related_product.slug %}" 
+                           title="{{ related_product.name }}">
+                            {{ related_product.name|truncatewords:8 }}
+                        </a>
+                    </h3>
+                    
+                    <div class="product-rating-modern">
+                        <div class="stars" aria-label="Note : 4 sur 5">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-count">({{ related_product.views_count }})</span>
+                    </div>
+                    
+                    <div class="product-footer-modern">
+                        <div class="product-price-modern">
+                            <span class="price-current">{{ related_product.current_price|floatformat:0 }}</span>
+                            <span class="price-currency">FCFA</span>
+                            {% if related_product.has_discount %}
+                            <span class="price-old">{{ related_product.base_price|floatformat:0 }} FCFA</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="product-actions-modern">
+                        <a href="{% url 'shop:product_detail' related_product.slug %}" 
+                           class="btn-product-view">
+                            <i class="fas fa-eye"></i>
+                            <span>Voir</span>
+                        </a>
+                        <button type="button"
+                                class="btn-product-cart"
+                                data-product-id="{{ related_product.id }}">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ========================================
+     PRODUITS RÉCEMMENT CONSULTÉS
+     ======================================== -->
+<section class="recently-viewed-section" id="recently-viewed" style="display: none;">
+    <div class="container">
+        <div class="section-header-modern">
+            <h2 class="section-title-modern">
+                <span class="title-icon">
+                    <i class="fas fa-history"></i>
+                </span>
+                Récemment consultés
+            </h2>
+        </div>
+        <div class="recently-viewed-grid" id="recently-viewed-grid">
+            <!-- Rempli dynamiquement via JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     MODALS
+     ======================================== -->
+
+<!-- Modal Zoom d'Image -->
+<div class="image-modal-overlay" id="imageZoomModal" style="display: none;">
+    <div class="image-modal-content">
+        <button type="button" 
+                class="image-modal-close"
+                aria-label="Fermer">&times;</button>
+        <img src="" alt="Zoom" class="image-modal-img" id="zoomedImage">
+        <div class="image-modal-nav">
+            <button type="button" 
+                    class="image-nav-btn image-nav-prev"
+                    aria-label="Image précédente">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button type="button" 
+                    class="image-nav-btn image-nav-next"
+                    aria-label="Image suivante">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="image-modal-counter">
+            <span id="modal-current-image">1</span> / <span id="modal-total-images">1</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Guide des Tailles -->
+<div class="modal fade" id="sizeGuideModal" tabindex="-1" aria-labelledby="sizeGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sizeGuideModalLabel">
+                    <i class="fas fa-ruler-combined"></i>
+                    Guide des tailles
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="size-guide-content">
+                    <h6>Comment prendre vos mesures</h6>
+                    <ul class="measurement-tips">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Utilisez un mètre ruban pour mesurer votre corps
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Prenez les mesures sur des vêtements légers
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            En cas de doute, choisissez la taille au-dessus
+                        </li>
+                    </ul>
+                    
+                    <div class="size-table-container">
+                        <table class="table table-bordered size-guide-table">
+                            <thead>
+                                <tr>
+                                    <th>Taille</th>
+                                    <th>Poitrine (cm)</th>
+                                    <th>Taille (cm)</th>
+                                    <th>Hanches (cm)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>XS</strong></td>
+                                    <td>80-84</td>
+                                    <td>60-64</td>
+                                    <td>86-90</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>S</strong></td>
+                                    <td>85-89</td>
+                                    <td>65-69</td>
+                                    <td>91-95</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>M</strong></td>
+                                    <td>90-94</td>
+                                    <td>70-74</td>
+                                    <td>96-100</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>L</strong></td>
+                                    <td>95-99</td>
+                                    <td>75-79</td>
+                                    <td>101-105</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XL</strong></td>
+                                    <td>100-104</td>
+                                    <td>80-84</td>
+                                    <td>106-110</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XXL</strong></td>
+                                    <td>105-110</td>
+                                    <td>85-90</td>
+                                    <td>111-116</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Écrire un Avis -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">
+                    <i class="fas fa-star"></i>
+                    Donner votre avis
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm" class="review-form">
+                    <div class="mb-3">
+                        <label class="form-label">Votre note *</label>
+                        <div class="rating-input">
+                            <input type="radio" name="rating" value="5" id="star5" required>
+                            <label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" value="4" id="star4">
+                            <label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" value="3" id="star3">
+                            <label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" value="2" id="star2">
+                            <label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" value="1" id="star1">
+                            <label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reviewTitle" class="form-label">Titre de l'avis</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="reviewTitle" 
+                               placeholder="Résumez votre expérience">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="reviewComment" class="form-label">Votre commentaire *</label>
+                        <textarea class="form-control" 
+                                  id="reviewComment" 
+                                  rows="5" 
+                                  placeholder="Partagez votre expérience avec ce produit..."
+                                  required></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <small>Votre avis sera visible après modération</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane"></i>
+                        Publier mon avis
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Aperçu Rapide (Quick View) -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickViewModalLabel">Aperçu rapide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body" id="quickViewContent">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Chargement...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p>Chargement...</p>
+    </div>
+</div>
+
+
+<!-- Conteneur des Notifications Toast -->
+<div class="toast-container" 
+     id="toastContainer" 
+     aria-live="polite" 
+     aria-atomic="true">
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/shop/product-detail.js' %}"></script>
+
+{% endblock %}

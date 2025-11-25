@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Tableau de Bord | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Gérez votre compte, consultez vos commandes et accédez à toutes vos informations personnelles.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO DASHBOARD
+     ======================================== -->
+<section class="dashboard-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-down">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Mon compte</span>
+            </div>
+            
+            <!-- Titre + Actions rapides -->
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="welcome-message">
+                        <h1 class="hero-title">
+                            Bienvenue, <span class="gradient-text">{{ user.first_name }}</span> ! 👋
+                        </h1>
+                        <p class="hero-subtitle">Voici un aperçu de votre compte et de vos activités récentes</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="quick-actions-hero">
+                        <a href="{% url 'shop:product_list' %}" class="btn-hero-action primary">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Continuer mes achats</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     DASHBOARD CONTENT
+     ======================================== -->
+<section class="dashboard-section">
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- ========================================
+                 SIDEBAR NAVIGATION
+                 ======================================== -->
+            <div class="col-lg-3">
+                <div class="sidebar-sticky">
+                    
+                    <!-- Profil Card -->
+                    <div class="profile-card" data-aos="fade-right">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <span class="avatar-text">{{ user.first_name.0|upper }}{{ user.last_name.0|upper }}</span>
+                                <div class="avatar-status"></div>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h5 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h5>
+                            <p class="profile-email">{{ user.email }}</p>
+                            <div class="profile-badge">
+                                <i class="fas fa-crown"></i>
+                                <span>Membre depuis {{ user.date_joined|date:"Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <nav class="dashboard-nav" data-aos="fade-right" data-aos-delay="100">
+                        <a href="{% url 'accounts:dashboard' %}" class="nav-item active">
+                            <div class="nav-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <span class="nav-text">Tableau de bord</span>
+                        </a>
+                        
+                        <a href="{% url 'accounts:order_list' %}" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <span class="nav-text">Mes commandes</span>
+                            {% if pending_orders > 0 %}
+                            <span class="nav-badge">{{ pending_orders }}</span>
+                            {% endif %}
+                        </a>
+                        
+                        <a href="{% url 'accounts:profile' %}" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="nav-text">Mon profil</span>
+                        </a>
+                        
+                        <a href="{% url 'accounts:address_list' %}" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span class="nav-text">Mes adresses</span>
+                        </a>
+                        
+                        <a href="#" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <span class="nav-text">Liste de souhaits</span>
+                        </a>
+                        
+                        <a href="#" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <span class="nav-text">Notifications</span>
+                            <span class="nav-badge">3</span>
+                        </a>
+                        
+                        <a href="#" class="nav-item">
+                            <div class="nav-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span class="nav-text">Paramètres</span>
+                        </a>
+                        
+                        <div class="nav-divider"></div>
+                        
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-item logout">
+                                <div class="nav-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <span class="nav-text">Déconnexion</span>
+                            </button>
+                        </form>
+                    </nav>
+                    
+                </div>
+            </div>
+            
+            <!-- ========================================
+                 CONTENU PRINCIPAL
+                 ======================================== -->
+            <div class="col-lg-9">
+                
+                <!-- Statistiques -->
+                <div class="stats-grid" data-aos="fade-up">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total commandes</span>
+                            <h3 class="stat-value" data-count="{{ total_orders }}">0</h3>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">En attente</span>
+                            <h3 class="stat-value" data-count="{{ pending_orders }}">0</h3>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Livrées</span>
+                            <h3 class="stat-value" data-count="{{ total_orders|add:'-'|add:pending_orders }}">0</h3>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card info">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Favoris</span>
+                            <h3 class="stat-value" data-count="0">0</h3>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Commandes récentes -->
+                <div class="content-card" data-aos="fade-up">
+                    <div class="card-header-modern">
+                        <div class="header-left">
+                            <div class="header-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <h4 class="header-title">Commandes récentes</h4>
+                                <p class="header-subtitle">Vos 5 dernières commandes</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'accounts:order_list' %}" class="btn-view-all">
+                            <span>Voir tout</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        {% if recent_orders %}
+                        <div class="orders-list">
+                            {% for order in recent_orders %}
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <div class="order-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <div class="order-details">
+                                        <h6 class="order-number">{{ order.order_number }}</h6>
+                                        <p class="order-date">
+                                            <i class="fas fa-calendar"></i>
+                                            {{ order.created_at|date:"d/m/Y à H:i" }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-amount">
+                                    <span class="amount-value">{{ order.total|floatformat:0 }} FCFA</span>
+                                </div>
+                                
+                                <div class="order-status">
+                                    <span class="status-badge 
+                                        {% if order.status == 'delivered' %}delivered
+                                        {% elif order.status == 'pending' %}pending
+                                        {% elif order.status == 'processing' %}processing
+                                        {% elif order.status == 'shipped' %}shipped
+                                        {% else %}cancelled{% endif %}">
+                                        <span class="status-dot"></span>
+                                        <span>{{ order.get_status_display }}</span>
+                                    </span>
+                                </div>
+                                
+                                <div class="order-actions">
+                                    <a href="{% url 'accounts:order_detail' order.order_number %}" class="btn-order-view">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Voir</span>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <h5 class="empty-title">Aucune commande pour le moment</h5>
+                            <p class="empty-text">Commencez vos achats dès maintenant et profitez de nos offres !</p>
+                            <a href="{% url 'shop:product_list' %}" class="btn-empty-action">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>Découvrir la boutique</span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Actions rapides -->
+                <div class="quick-actions-section" data-aos="fade-up">
+                    <h5 class="section-title">
+                        <i class="fas fa-bolt"></i>
+                        <span>Actions rapides</span>
+                    </h5>
+                    
+                    <div class="actions-grid">
+                        <a href="{% url 'accounts:profile_edit' %}" class="action-card">
+                            <div class="action-icon primary">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6 class="action-title">Modifier mon profil</h6>
+                                <p class="action-description">Mettre à jour mes informations</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="{% url 'accounts:address_list' %}" class="action-card">
+                            <div class="action-icon success">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6 class="action-title">Gérer mes adresses</h6>
+                                <p class="action-description">Ajouter ou modifier mes adresses</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="{% url 'core:contact' %}" class="action-card">
+                            <div class="action-icon info">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6 class="action-title">Besoin d'aide ?</h6>
+                                <p class="action-description">Contacter le support</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="{% url 'core:faq' %}" class="action-card">
+                            <div class="action-icon warning">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6 class="action-title">Centre d'aide</h6>
+                                <p class="action-description">Questions fréquentes</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Conseils / Tips -->
+                <div class="tips-card" data-aos="fade-up">
+                    <div class="tips-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="tips-content">
+                        <h6 class="tips-title">💡 Astuce du jour</h6>
+                        <p class="tips-text">
+                            Activez les notifications pour être informé en temps réel de l'état de vos commandes 
+                            et ne manquez aucune offre spéciale !
+                        </p>
+                    </div>
+                    <button class="tips-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+<!-- Dashboard JS -->
+<script src="{% static 'js/accounts/dashboard.js' %}"></script>
+{% endblock %}

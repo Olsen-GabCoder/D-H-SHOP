@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Commandes | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Consultez l'historique et le suivi de toutes vos commandes. Suivez vos livraisons en temps réel.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/orders.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO COMMANDES MODERNE
+     ======================================== -->
+<section class="orders-hero">
+    <div class="orders-hero-bg"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-40">
+            <div class="col-lg-8" data-aos="fade-right">
+                <div class="hero-breadcrumb">
+                    <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Mes Commandes</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    <span class="hero-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </span>
+                    Mes <span class="gradient-text">Commandes</span>
+                </h1>
+                <p class="hero-description">
+                    Suivez l'état de vos commandes et gérez vos livraisons en temps réel
+                </p>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="hero-stats-card">
+                    <div class="stat-item">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ orders.count }}</h4>
+                            <p>Commandes</p>
+                        </div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>{{ delivered_count|default:"0" }}</h4>
+                            <p>Livrées</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FILTRES & RECHERCHE
+     ======================================== -->
+<section class="filters-section">
+    <div class="container">
+        <div class="filters-card" data-aos="fade-up">
+            <!-- Tabs de filtrage -->
+            <ul class="filter-tabs">
+                <li class="filter-tab active" data-filter="all">
+                    <div class="tab-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <span class="tab-text">Toutes</span>
+                    <span class="tab-count">{{ orders.count }}</span>
+                </li>
+                <li class="filter-tab" data-filter="pending">
+                    <div class="tab-icon pending-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="tab-text">En attente</span>
+                    <span class="tab-count" id="pending-count">0</span>
+                </li>
+                <li class="filter-tab" data-filter="processing">
+                    <div class="tab-icon processing-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <span class="tab-text">En traitement</span>
+                    <span class="tab-count" id="processing-count">0</span>
+                </li>
+                <li class="filter-tab" data-filter="shipped">
+                    <div class="tab-icon shipped-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <span class="tab-text">Expédié</span>
+                    <span class="tab-count" id="shipped-count">0</span>
+                </li>
+                <li class="filter-tab" data-filter="delivered">
+                    <div class="tab-icon delivered-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <span class="tab-text">Livré</span>
+                    <span class="tab-count" id="delivered-count">0</span>
+                </li>
+            </ul>
+            
+            <!-- Barre de recherche -->
+            <div class="search-orders">
+                <i class="fas fa-search"></i>
+                <input type="text" id="order-search" placeholder="Rechercher une commande par numéro...">
+                <button class="btn-clear" id="clear-search" style="display: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     LISTE DES COMMANDES
+     ======================================== -->
+<section class="orders-content-section">
+    <div class="container">
+        
+        {% if orders %}
+        <div id="orders-container">
+            {% for order in orders %}
+            <div class="order-card-modern" data-status="{{ order.status }}" data-aos="fade-up">
+                
+                <!-- Header de la carte -->
+                <div class="order-card-header">
+                    <div class="order-info-left">
+                        <div class="order-number">
+                            <i class="fas fa-receipt"></i>
+                            <span>{{ order.order_number }}</span>
+                        </div>
+                        <div class="order-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>{{ order.created_at|date:"d/m/Y à H:i" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="order-status-badge {{ order.status }}">
+                        <span class="status-dot"></span>
+                        <span class="status-text">{{ order.get_status_display }}</span>
+                    </div>
+                </div>
+                
+                <!-- Corps de la carte -->
+                <div class="order-card-body">
+                    <div class="order-details-grid">
+                        
+                        <!-- Colonne 1: Informations -->
+                        <div class="detail-item">
+                            <div class="detail-icon primary">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Articles</span>
+                                <span class="detail-value">{{ order.item_count }} article{{ order.item_count|pluralize }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Colonne 2: Paiement -->
+                        <div class="detail-item">
+                            <div class="detail-icon {% if order.is_paid %}success{% else %}warning{% endif %}">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Paiement</span>
+                                <span class="detail-value">
+                                    {% if order.is_paid %}
+                                        <span class="badge-paid">Payé</span>
+                                    {% else %}
+                                        <span class="badge-unpaid">Non payé</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Colonne 3: Total -->
+                        <div class="detail-item">
+                            <div class="detail-icon gradient">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Total</span>
+                                <span class="detail-value total-amount">{{ order.total|floatformat:0 }} FCFA</span>
+                            </div>
+                        </div>
+                        
+                        {% if order.tracking_number %}
+                        <!-- Colonne 4: Suivi -->
+                        <div class="detail-item">
+                            <div class="detail-icon info">
+                                <i class="fas fa-barcode"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">N° de suivi</span>
+                                <span class="detail-value tracking-number">{{ order.tracking_number }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Progress bar pour les commandes en cours -->
+                    {% if order.status == 'processing' or order.status == 'shipped' %}
+                    <div class="order-progress">
+                        <div class="progress-steps">
+                            <div class="progress-step completed">
+                                <div class="step-icon"><i class="fas fa-check"></i></div>
+                                <span class="step-label">Confirmée</span>
+                            </div>
+                            <div class="progress-line {% if order.status == 'shipped' %}completed{% endif %}"></div>
+                            <div class="progress-step {% if order.status == 'shipped' %}completed{% else %}active{% endif %}">
+                                <div class="step-icon"><i class="fas fa-box-open"></i></div>
+                                <span class="step-label">En préparation</span>
+                            </div>
+                            <div class="progress-line {% if order.status == 'delivered' %}completed{% endif %}"></div>
+                            <div class="progress-step {% if order.status == 'delivered' %}completed{% endif %}">
+                                <div class="step-icon"><i class="fas fa-truck"></i></div>
+                                <span class="step-label">En livraison</span>
+                            </div>
+                            <div class="progress-line"></div>
+                            <div class="progress-step">
+                                <div class="step-icon"><i class="fas fa-home"></i></div>
+                                <span class="step-label">Livrée</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Footer de la carte -->
+                <div class="order-card-footer">
+                    <a href="{% url 'accounts:order_detail' order.order_number %}" class="btn-order-action primary">
+                        <i class="fas fa-eye"></i>
+                        <span>Voir les détails</span>
+                    </a>
+                    
+                    {% if order.can_be_cancelled %}
+                    <button class="btn-order-action danger" onclick="cancelOrder('{{ order.order_number }}')">
+                        <i class="fas fa-times"></i>
+                        <span>Annuler</span>
+                    </button>
+                    {% endif %}
+                    
+                    {% if order.status == 'delivered' %}
+                    <button class="btn-order-action success">
+                        <i class="fas fa-redo"></i>
+                        <span>Recommander</span>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- État vide -->
+        <div class="empty-state" data-aos="zoom-in">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h3 class="empty-title">Aucune commande pour le moment</h3>
+            <p class="empty-description">
+                Vous n'avez pas encore passé de commande. Découvrez nos produits et commencez vos achats dès maintenant !
+            </p>
+            <a href="{% url 'shop:product_list' %}" class="btn-empty-action">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Découvrir la boutique</span>
+            </a>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/orders.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+{% endblock %}

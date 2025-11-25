@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if action == 'add' %}Ajouter une Adresse{% else %}Modifier l'Adresse{% endif %} | E-Commerce Gabon
+{% endblock %}
+
+{% block meta_description %}
+    {% if action == 'add' %}
+        Ajoutez une nouvelle adresse de livraison ou de facturation à votre compte.
+    {% else %}
+        Modifiez votre adresse de livraison ou de facturation.
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/address-form.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO FORM
+     ======================================== -->
+<section class="form-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-down">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'accounts:address_list' %}">Mes adresses</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>{% if action == 'add' %}Ajouter{% else %}Modifier{% endif %}</span>
+            </div>
+            
+            <!-- Titre -->
+            <div class="hero-title-wrapper">
+                <div class="hero-icon">
+                    {% if action == 'add' %}
+                    <i class="fas fa-plus-circle"></i>
+                    {% else %}
+                    <i class="fas fa-edit"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h1 class="hero-title">
+                        {% if action == 'add' %}
+                            <span class="gradient-text">Ajouter</span> une Adresse
+                        {% else %}
+                            <span class="gradient-text">Modifier</span> l'Adresse
+                        {% endif %}
+                    </h1>
+                    <p class="hero-subtitle">Remplissez tous les champs requis pour continuer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FORM CONTENT
+     ======================================== -->
+<section class="form-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <div class="form-container" data-aos="fade-up">
+                    
+                    <!-- Progress Bar -->
+                    <div class="form-progress">
+                        <div class="progress-step active" data-step="1">
+                            <div class="step-circle">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="step-label">Contact</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="2">
+                            <div class="step-circle">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <span class="step-label">Adresse</span>
+                        </div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="3">
+                            <div class="step-circle">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span class="step-label">Options</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages -->
+                    {% if messages %}
+                    <div class="messages-container">
+                        {% for message in messages %}
+                        <div class="alert-modern alert-{{ message.tags }}">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" id="addressForm" class="address-form">
+                        {% csrf_token %}
+                        
+                        <!-- SECTION 1: Contact -->
+                        <div class="form-step active" data-step="1">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title">Informations de Contact</h3>
+                                    <p class="section-description">Qui recevra cette livraison ?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group-modern">
+                                    <label for="full_name" class="form-label-modern">
+                                        <i class="fas fa-user"></i>
+                                        Nom complet
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="full_name" 
+                                           name="full_name" 
+                                           value="{{ address.full_name|default:'' }}"
+                                           placeholder="Ex: Jean Dupont"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="phone" class="form-label-modern">
+                                        <i class="fas fa-phone"></i>
+                                        Téléphone
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control-modern" 
+                                           id="phone" 
+                                           name="phone" 
+                                           value="{{ address.phone|default:'' }}"
+                                           placeholder="Ex: +241 00 00 00 00"
+                                           required>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Format: +241 00 00 00 00
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-step-modern btn-next" data-next="2">
+                                    <span>Suivant</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- SECTION 2: Adresse -->
+                        <div class="form-step" data-step="2">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title">Adresse Complète</h3>
+                                    <p class="section-description">Où devons-nous livrer ?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group-modern">
+                                <label for="address_line1" class="form-label-modern">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Adresse ligne 1
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control-modern" 
+                                       id="address_line1" 
+                                       name="address_line1" 
+                                       value="{{ address.address_line1|default:'' }}"
+                                       placeholder="Ex: 123 Rue de la République"
+                                       required>
+                                <div class="form-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group-modern">
+                                <label for="address_line2" class="form-label-modern">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Adresse ligne 2
+                                    <span class="optional">(optionnel)</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control-modern" 
+                                       id="address_line2" 
+                                       name="address_line2" 
+                                       value="{{ address.address_line2|default:'' }}"
+                                       placeholder="Appartement, bâtiment, étage...">
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group-modern">
+                                    <label for="city" class="form-label-modern">
+                                        <i class="fas fa-city"></i>
+                                        Ville
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="city" 
+                                           name="city" 
+                                           value="{{ address.city|default:'' }}"
+                                           placeholder="Ex: Libreville"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="state" class="form-label-modern">
+                                        <i class="fas fa-map"></i>
+                                        Région/État
+                                        <span class="optional">(optionnel)</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="state" 
+                                           name="state" 
+                                           value="{{ address.state|default:'' }}"
+                                           placeholder="Ex: Estuaire">
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="postal_code" class="form-label-modern">
+                                        <i class="fas fa-mail-bulk"></i>
+                                        Code postal
+                                        <span class="optional">(optionnel)</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="postal_code" 
+                                           name="postal_code" 
+                                           value="{{ address.postal_code|default:'' }}"
+                                           placeholder="Ex: BP 1234">
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="country" class="form-label-modern">
+                                        <i class="fas fa-globe"></i>
+                                        Pays
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select class="form-control-modern" id="country" name="country" required>
+                                        <option value="">Sélectionner un pays</option>
+                                        <option value="Gabon" {% if address.country == 'Gabon' or not address %}selected{% endif %}>Gabon</option>
+                                        <option value="Cameroun" {% if address.country == 'Cameroun' %}selected{% endif %}>Cameroun</option>
+                                        <option value="Congo" {% if address.country == 'Congo' %}selected{% endif %}>Congo</option>
+                                        <option value="Guinée Équatoriale" {% if address.country == "Guinée Équatoriale" %}selected{% endif %}>Guinée Équatoriale</option>
+                                        <option value="République Centrafricaine" {% if address.country == 'République Centrafricaine' %}selected{% endif %}>République Centrafricaine</option>
+                                    </select>
+                                    <div class="form-feedback"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-step-modern btn-prev" data-prev="1">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Précédent</span>
+                                </button>
+                                <button type="button" class="btn-step-modern btn-next" data-next="3">
+                                    <span>Suivant</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- SECTION 3: Options -->
+                        <div class="form-step" data-step="3">
+                            <div class="section-header">
+                                <div class="section-icon">
+                                    <i class="fas fa-sliders-h"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title">Type et Options</h3>
+                                    <p class="section-description">Configurez cette adresse</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-tags"></i>
+                                    Type d'adresse
+                                    <span class="required">*</span>
+                                </label>
+                                
+                                <div class="address-type-cards">
+                                    <label class="type-card">
+                                        <input type="radio" 
+                                               name="address_type" 
+                                               value="shipping" 
+                                               {% if address.address_type == 'shipping' or not address %}checked{% endif %} 
+                                               required>
+                                        <div class="card-content">
+                                            <div class="card-icon shipping">
+                                                <i class="fas fa-shipping-fast"></i>
+                                            </div>
+                                            <h5 class="card-title">Livraison</h5>
+                                            <p class="card-description">Adresse de livraison de vos commandes</p>
+                                        </div>
+                                        <div class="card-checkmark">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="type-card">
+                                        <input type="radio" 
+                                               name="address_type" 
+                                               value="billing" 
+                                               {% if address.address_type == 'billing' %}checked{% endif %} 
+                                               required>
+                                        <div class="card-content">
+                                            <div class="card-icon billing">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </div>
+                                            <h5 class="card-title">Facturation</h5>
+                                            <p class="card-description">Adresse de facturation pour vos paiements</p>
+                                        </div>
+                                        <div class="card-checkmark">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group-modern">
+                                <div class="checkbox-modern checkbox-large">
+                                    <input type="checkbox" 
+                                           id="is_default" 
+                                           name="is_default" 
+                                           {% if address.is_default %}checked{% endif %}>
+                                    <label for="is_default">
+                                        <span class="checkbox-icon">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span class="checkbox-content">
+                                            <span class="checkbox-title">
+                                                <i class="fas fa-star"></i>
+                                                Définir comme adresse par défaut
+                                            </span>
+                                            <span class="checkbox-description">
+                                                Cette adresse sera utilisée automatiquement pour vos commandes
+                                            </span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-summary">
+                                <div class="summary-icon">
+                                    <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="summary-content">
+                                    <h6 class="summary-title">Vérifiez vos informations</h6>
+                                    <p class="summary-text">
+                                        Assurez-vous que toutes les informations sont correctes avant de valider.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-step-modern btn-prev" data-prev="2">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Précédent</span>
+                                </button>
+                                <button type="submit" class="btn-step-modern btn-submit">
+                                    <i class="fas fa-save"></i>
+                                    <span>{% if action == 'add' %}Ajouter l'adresse{% else %}Enregistrer les modifications{% endif %}</span>
+                                    <span class="btn-loader">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Enregistrement...
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Cancel Link -->
+                    <div class="form-footer">
+                        <a href="{% url 'accounts:address_list' %}" class="btn-cancel">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Annuler et revenir aux adresses</span>
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+<!-- Address Form JS -->
+<script src="{% static 'js/accounts/address-form.js' %}"></script>
+{% endblock %}

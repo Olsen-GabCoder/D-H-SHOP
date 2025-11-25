@@ -1,0 +1,766 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if query %}Recherche : {{ query }}{% else %}Recherche de produits{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+Recherchez parmi notre large sélection de produits. Trouvez exactement ce que vous cherchez.
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     BREADCRUMB
+     ======================================== -->
+<section class="bg-light py-3">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'shop:product_list' %}">Boutique</a></li>
+                <li class="breadcrumb-item active">Recherche</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- ========================================
+     HEADER RECHERCHE
+     ======================================== -->
+<section class="section bg-light pt-5 pb-4">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold mb-4">
+                <i class="fas fa-search me-3 text-primary"></i>
+                Recherche de produits
+            </h1>
+            
+            <!-- Barre de recherche principale -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <form method="get" action="{% url 'shop:product_search' %}">
+                        <div class="input-group input-group-lg shadow-lg">
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="q" 
+                                   value="{{ query }}" 
+                                   placeholder="Rechercher un produit, une marque, une catégorie..."
+                                   required
+                                   autofocus>
+                            <button class="btn btn-primary px-5" type="submit">
+                                <i class="fas fa-search me-2"></i> Rechercher
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if query %}
+                    <div class="mt-3">
+                        <p class="text-muted mb-2">
+                            Vous avez recherché : <strong class="text-primary">"{{ query }}"</strong>
+                        </p>
+                        <a href="{% url 'shop:product_search' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i> Effacer la recherche
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suggestions de recherche populaires -->
+        <div class="text-center mt-4">
+            <p class="text-muted small mb-2">Recherches populaires :</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="?q=smartphone" class="badge bg-light text-dark border px-3 py-2 text-decoration-none">
+                    <i class="fas fa-mobile-alt me-1"></i> Smartphone
+                </a>
+                <a href="?q=ordinateur" class="badge bg-light text-dark border px-3 py-2 text-decoration-none">
+                    <i class="fas fa-laptop me-1"></i> Ordinateur
+                </a>
+                <a href="?q=vetements" class="badge bg-light text-dark border px-3 py-2 text-decoration-none">
+                    <i class="fas fa-tshirt me-1"></i> Vêtements
+                </a>
+                <a href="?q=chaussures" class="badge bg-light text-dark border px-3 py-2 text-decoration-none">
+                    <i class="fas fa-shoe-prints me-1"></i> Chaussures
+                </a>
+                <a href="?q=accessoires" class="badge bg-light text-dark border px-3 py-2 text-decoration-none">
+                    <i class="fas fa-glasses me-1"></i> Accessoires
+                </a>
+                </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     RÉSULTATS DE RECHERCHE
+     ======================================== -->
+<section class="section">
+    <div class="container">
+        
+        {% if query %}
+            {% if page_obj %}
+            
+            <!-- En-tête des résultats -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                <strong>{{ products_count }}</strong> résultat{{ products_count|pluralize }} 
+                                pour "<span class="text-primary">{{ query }}</span>"
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-md-end gap-2">
+                                <label for="sort-search" class="text-muted small mb-0">Trier par :</label>
+                                <select class="form-select form-select-sm" id="sort-search" style="width: auto;">
+                                    <option value="relevance">Pertinence</option>
+                                    <option value="newest">Plus récents</option>
+                                    <option value="popular">Plus populaires</option>
+                                    <option value="price-asc">Prix croissant</option>
+                                    <option value="price-desc">Prix décroissant</option>
+                                    <option value="name-asc">Nom A-Z</option>
+                                </select>
+                                
+                                <div class="btn-group ms-2" role="group">
+                                    <button type="button" class="view-toggle-btn active" data-view="grid">
+                                        <i class="fas fa-th"></i>
+                                    </button>
+                                    <button type="button" class="view-toggle-btn" data-view="list">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtres rapides -->
+            <div class="mb-4">
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-sm btn-outline-primary filter-quick" data-filter="all">
+                        <i class="fas fa-check-circle me-1"></i> Tous
+                    </button>
+                    <button class="btn btn-sm btn-outline-success filter-quick" data-filter="in-stock">
+                        <i class="fas fa-box me-1"></i> En stock
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger filter-quick" data-filter="on-sale">
+                        <i class="fas fa-tag me-1"></i> En promotion
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning filter-quick" data-filter="new">
+                        <i class="fas fa-star me-1"></i> Nouveautés
+                    </button>
+                    <button class="btn btn-sm btn-outline-info filter-quick" data-filter="featured">
+                        <i class="fas fa-fire me-1"></i> Phares
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Grille de résultats -->
+            <div class="row g-4 product-grid-view" id="search-results">
+                {% for product in page_obj %}
+                <div class="col-lg-3 col-md-4 col-sm-6 product-item"
+                     data-price="{{ product.current_price }}"
+                     data-name="{{ product.name|lower }}"
+                     data-category="{{ product.category.slug }}"
+                     data-stock="{{ product.variants.first.stock.is_in_stock }}"
+                     data-sale="{{ product.has_discount }}"
+                     data-new="{{ product.is_new }}"
+                     data-featured="{{ product.is_featured }}">
+                    <div class="card product-card h-100">
+                        
+                        <!-- Badges multiples -->
+                        <div class="position-relative">
+                            {% if product.has_discount %}
+                            <span class="product-badge sale">-{{ product.discount_percentage }}%</span>
+                            {% endif %}
+                            
+                            {% if product.is_new %}
+                            <span class="product-badge new" style="top: 60px;">Nouveau</span>
+                            {% endif %}
+                            
+                            {% if product.is_featured %}
+                            <span class="product-badge" style="top: 105px; background: gold; color: #333;">
+                                <i class="fas fa-star"></i> Phare
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Image -->
+                        <a href="{% url 'shop:product_detail' product.slug %}">
+                            <div class="product-image-wrapper">
+                                <img src="{{ product.main_image.url }}" 
+                                     alt="{{ product.name }}" 
+                                     class="product-image"
+                                     loading="lazy">
+                                
+                                <div class="product-overlay">
+                                    <button class="product-overlay-btn" title="Voir détails">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="product-overlay-btn add-to-cart-btn" 
+                                            data-product-id="{{ product.id }}"
+                                            title="Ajouter au panier">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                    <button class="product-overlay-btn wishlist-btn" 
+                                            data-product-id="{{ product.id }}"
+                                            title="Liste de souhaits">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <!-- Corps de la carte -->
+                        <div class="product-card-body">
+                            <div class="product-category mb-2">
+                                <a href="{% url 'shop:category_detail' product.category.slug %}" 
+                                   class="text-decoration-none">
+                                    <i class="fas fa-folder me-1"></i> {{ product.category.name }}
+                                </a>
+                            </div>
+                            
+                            <h5 class="product-title">
+                                <a href="{% url 'shop:product_detail' product.slug %}" 
+                                   class="text-decoration-none text-dark">
+                                    {{ product.name }}
+                                </a>
+                            </h5>
+                            
+                            <div class="product-rating mb-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= 4 %}
+                                    <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="text-muted small ms-1">
+                                    ({{ product.views_count }})
+                                </span>
+                            </div>
+                            
+                            {% if product.short_description %}
+                            <p class="text-muted small mb-3" 
+                               style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; overflow: hidden;">
+                                {{ product.short_description }}
+                            </p>
+                            {% endif %}
+                            
+                            <div class="product-price mb-3">
+                                <span class="product-price-current">
+                                    {{ product.current_price|floatformat:0 }} FCFA
+                                </span>
+                                {% if product.has_discount %}
+                                <span class="product-price-old">
+                                    {{ product.base_price|floatformat:0 }} FCFA
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Stock et ventes -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                {% if product.variants.first.stock.is_in_stock %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> En stock
+                                </span>
+                                {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times"></i> Rupture
+                                </span>
+                                {% endif %}
+                                
+                                <span class="text-muted small">
+                                    <i class="fas fa-shopping-bag me-1"></i>
+                                    {{ product.sales_count }} vente{{ product.sales_count|pluralize }}
+                                </span>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <a href="{% url 'shop:product_detail' product.slug %}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-info-circle me-2"></i> Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Navigation des résultats" class="mt-5">
+                <ul class="pagination pagination-lg justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i> Précédent
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">
+                            Suivant <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            {% else %}
+            <!-- Aucun résultat trouvé -->
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-search fa-5x text-muted"></i>
+                            </div>
+                            <h2 class="fw-bold mb-3">Aucun résultat trouvé</h2>
+                            <p class="lead text-muted mb-4">
+                                Désolé, nous n'avons trouvé aucun produit correspondant à 
+                                "<strong>{{ query }}</strong>"
+                            </p>
+                            
+                            <!-- Suggestions -->
+                            <div class="alert alert-info text-start">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-lightbulb me-2"></i> Suggestions :
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Vérifiez l'orthographe de vos mots-clés</li>
+                                    <li>Essayez des mots-clés plus généraux</li>
+                                    <li>Utilisez moins de mots-clés</li>
+                                    <li>Naviguez par catégories</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-flex justify-content-center gap-3 mt-4">
+                                <a href="{% url 'shop:product_list' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-th me-2"></i> Voir tous les produits
+                                </a>
+                                <a href="{% url 'core:home' %}" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-home me-2"></i> Retour à l'accueil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+        <!-- Aucune recherche effectuée -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-search-plus fa-5x text-primary"></i>
+                        </div>
+                        <h2 class="fw-bold mb-3">Commencez votre recherche</h2>
+                        <p class="lead text-muted mb-4">
+                            Utilisez la barre de recherche ci-dessus pour trouver les produits que vous recherchez
+                        </p>
+                        
+                        <!-- Catégories populaires -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Ou parcourez nos catégories populaires :</h5>
+                            <div class="d-flex flex-wrap justify-content-center gap-3">
+                                <a href="{% url 'shop:product_list' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-th me-2"></i> Toutes les catégories
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary">
+                                    <i class="fas fa-laptop me-2"></i> Électronique
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary">
+                                    <i class="fas fa-tshirt me-2"></i> Mode
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary">
+                                    <i class="fas fa-home me-2"></i> Maison
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Statistiques -->
+                        <div class="row g-4 mt-4">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="text-primary mb-0">500+</h3>
+                                    <p class="text-muted mb-0 small">Produits disponibles</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="text-success mb-0">50+</h3>
+                                    <p class="text-muted mb-0 small">Catégories</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h3 class="text-warning mb-0">100+</h3>
+                                    <p class="text-muted mb-0 small">Nouveautés/mois</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+
+<!-- ========================================
+     PRODUITS SUGGÉRÉS
+     ======================================== -->
+{% if query and page_obj %}
+<section class="section bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-3">
+                <i class="fas fa-lightbulb me-2 text-warning"></i>
+                Vous pourriez aussi aimer
+            </h3>
+            <p class="text-muted">Produits similaires à votre recherche</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for product in page_obj|slice:":4" %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100 hover-effect">
+                    <a href="{% url 'shop:product_detail' product.slug %}">
+                        <img src="{{ product.main_image.url }}" 
+                             class="card-img-top" 
+                             alt="{{ product.name }}"
+                             style="height: 200px; object-fit: cover;">
+                    </a>
+                    <div class="card-body">
+                        <h6 class="mb-2">
+                            <a href="{% url 'shop:product_detail' product.slug %}" 
+                               class="text-decoration-none text-dark">
+                                {{ product.name|truncatewords:5 }}
+                            </a>
+                        </h6>
+                        <p class="text-primary fw-bold mb-3">
+                            {{ product.current_price|floatformat:0 }} FCFA
+                        </p>
+                        <a href="{% url 'shop:product_detail' product.slug %}" 
+                           class="btn btn-outline-primary btn-sm w-100">
+                            Voir le produit
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ========================================
+     AIDE À LA RECHERCHE
+     ======================================== -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            Besoin d'aide pour votre recherche ?
+                        </h4>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-spell-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="fw-bold mb-2">Correction automatique</h6>
+                                        <p class="text-muted small mb-0">
+                                            Notre système corrige automatiquement les fautes de frappe courantes
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-filter"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="fw-bold mb-2">Filtres avancés</h6>
+                                        <p class="text-muted small mb-0">
+                                            Affinez vos résultats avec nos filtres de prix, catégorie et disponibilité
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-tags"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="fw-bold mb-2">Recherche par catégorie</h6>
+                                        <p class="text-muted small mb-0">
+                                            Combinez votre recherche avec une catégorie spécifique pour de meilleurs résultats
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="fw-bold mb-2">Support client</h6>
+                                        <p class="text-muted small mb-0">
+                                            Notre équipe est disponible pour vous aider à trouver ce que vous cherchez
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{% url 'core:contact' %}" class="btn btn-primary">
+                                <i class="fas fa-envelope me-2"></i> Contactez-nous
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========================================
+    // TOGGLE VUE GRILLE / LISTE
+    // ========================================
+    const viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
+    const searchResults = document.getElementById('search-results');
+    
+    if (viewToggleBtns.length > 0 && searchResults) {
+        viewToggleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                viewToggleBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (view === 'list') {
+                    searchResults.classList.remove('product-grid-view', 'row', 'g-4');
+                    searchResults.classList.add('product-list-view');
+                } else {
+                    searchResults.classList.add('product-grid-view', 'row', 'g-4');
+                    searchResults.classList.remove('product-list-view');
+                }
+            });
+        });
+    }
+    
+    // ========================================
+    // TRI DES RÉSULTATS
+    // ========================================
+    const sortSearch = document.getElementById('sort-search');
+    
+    if (sortSearch && searchResults) {
+        sortSearch.addEventListener('change', function() {
+            const sortType = this.value;
+            const productsArray = Array.from(document.querySelectorAll('.product-item'));
+            
+            productsArray.sort((a, b) => {
+                switch(sortType) {
+                    case 'price-asc':
+                        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                    case 'price-desc':
+                        return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                    case 'name-asc':
+                        return a.dataset.name.localeCompare(b.dataset.name);
+                    case 'relevance':
+                    case 'popular':
+                    case 'newest':
+                    default:
+                        return 0;
+                }
+            });
+            
+            searchResults.style.opacity = '0.5';
+            setTimeout(() => {
+                productsArray.forEach(product => {
+                    searchResults.appendChild(product);
+                });
+                searchResults.style.opacity = '1';
+            }, 200);
+        });
+    }
+    
+    // ========================================
+    // FILTRES RAPIDES
+    // ========================================
+    const filterQuickBtns = document.querySelectorAll('.filter-quick');
+    
+    filterQuickBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            const products = document.querySelectorAll('.product-item');
+            
+            // Update active button
+            filterQuickBtns.forEach(b => {
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-primary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning', 'btn-outline-info');
+            });
+            this.classList.remove('btn-outline-primary', 'btn-outline-success', 'btn-outline-danger', 'btn-outline-warning', 'btn-outline-info');
+            this.classList.add('btn-primary');
+            
+            // Filter products
+            let visibleCount = 0;
+            products.forEach(product => {
+                let show = true;
+                
+                if (filter === 'in-stock') {
+                    show = product.dataset.stock === 'True';
+                } else if (filter === 'on-sale') {
+                    show = product.dataset.sale === 'True';
+                } else if (filter === 'new') {
+                    show = product.dataset.new === 'True';
+                } else if (filter === 'featured') {
+                    show = product.dataset.featured === 'True';
+                }
+                
+                if (show) {
+                    product.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    product.style.display = 'none';
+                }
+            });
+            
+            // Show notification
+            if (filter !== 'all') {
+                showToast(`${visibleCount} produit(s) trouvé(s)`, 'info');
+            }
+        });
+    });
+    
+    // ========================================
+    // AJOUT AU PANIER
+    // ========================================
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const originalHtml = this.innerHTML;
+            
+            this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check"></i>';
+                showToast('Produit ajouté au panier !', 'success');
+                
+                setTimeout(() => {
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                }, 1500);
+            }, 800);
+        });
+    });
+    
+    // ========================================
+    // LISTE DE SOUHAITS
+    // ========================================
+    document.querySelectorAll('.wishlist-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const icon = this.querySelector('i');
+            
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                this.style.color = '#e74c3c';
+                showToast('Ajouté aux favoris', 'success');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                this.style.color = '';
+                showToast('Retiré des favoris', 'info');
+            }
+        });
+    });
+    
+    // ========================================
+    // HIGHLIGHT DES MOTS RECHERCHÉS
+    // ========================================
+    const query = "{{ query|escapejs }}";
+    if (query && query.length > 0) {
+        const productTitles = document.querySelectorAll('.product-title a');
+        productTitles.forEach(title => {
+            const text = title.textContent;
+            const regex = new RegExp(query, 'gi');
+            const highlighted = text.replace(regex, match => {
+                return `<mark style="background-color: #fff3cd; padding: 2px 4px; border-radius: 3px;">${match}</mark>`;
+            });
+            title.innerHTML = highlighted;
+        });
+    }
+    
+});
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+Date : 2025-11-17 05:01:31
+Directory : c:\mon_ecommerce\templates
+Total : 33 files,  35799 codes, 780 comments, 5281 blanks, all 41860 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| HTML     |         32 |     35,698 |        764 |      5,267 |     41,729 |
+| Python   |          1 |        101 |         16 |         14 |        131 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                      | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                         |         33 |     35,799 |        780 |      5,281 |     41,860 |
+| . (Files)                                                 |          2 |        135 |         25 |         25 |        185 |
+| accounts                                                  |          9 |     11,945 |        221 |      1,878 |     14,044 |
+| admin                                                     |          1 |        527 |         26 |         61 |        614 |
+| components                                                |          2 |      2,525 |         40 |        348 |      2,913 |
+| core                                                      |          4 |      6,139 |        117 |        902 |      7,158 |
+| email                                                     |          2 |        368 |          4 |         58 |        430 |
+| orders                                                    |          3 |      6,070 |        142 |        900 |      7,112 |
+| payments                                                  |          6 |      1,175 |         46 |        182 |      1,403 |
+| shop                                                      |          4 |      6,915 |        159 |        927 |      8,001 |
++-----------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                  | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\mon_ecommerce\templates\accounts\address_form.html     | HTML     |      1,463 |         21 |        232 |      1,716 |
+| c:\mon_ecommerce\templates\accounts\address_list.html     | HTML     |        945 |         24 |        145 |      1,114 |
+| c:\mon_ecommerce\templates\accounts\dashboard.html        | HTML     |      1,495 |         27 |        237 |      1,759 |
+| c:\mon_ecommerce\templates\accounts\login.html            | HTML     |      1,281 |         33 |        200 |      1,514 |
+| c:\mon_ecommerce\templates\accounts\order_detail.html     | HTML     |      1,535 |         31 |        238 |      1,804 |
+| c:\mon_ecommerce\templates\accounts\order_list.html       | HTML     |      1,432 |         27 |        229 |      1,688 |
+| c:\mon_ecommerce\templates\accounts\profile.html          | HTML     |      1,311 |         20 |        201 |      1,532 |
+| c:\mon_ecommerce\templates\accounts\profile_edit.html     | HTML     |      1,156 |         18 |        182 |      1,356 |
+| c:\mon_ecommerce\templates\accounts\register.html         | HTML     |      1,327 |         20 |        214 |      1,561 |
+| c:\mon_ecommerce\templates\admin\dashboard.html           | HTML     |        527 |         26 |         61 |        614 |
+| c:\mon_ecommerce\templates\base.html                      | HTML     |         34 |          9 |         11 |         54 |
+| c:\mon_ecommerce\templates\components\footer.html         | HTML     |      1,297 |         21 |        178 |      1,496 |
+| c:\mon_ecommerce\templates\components\navbar.html         | HTML     |      1,228 |         19 |        170 |      1,417 |
+| c:\mon_ecommerce\templates\core\about.html                | HTML     |      1,576 |         25 |        228 |      1,829 |
+| c:\mon_ecommerce\templates\core\contact.html              | HTML     |      1,784 |         38 |        265 |      2,087 |
+| c:\mon_ecommerce\templates\core\faq.html                  | HTML     |      1,158 |         22 |        182 |      1,362 |
+| c:\mon_ecommerce\templates\core\home.html                 | HTML     |      1,621 |         32 |        227 |      1,880 |
+| c:\mon_ecommerce\templates\email\base_email.html          | HTML     |        253 |          4 |         39 |        296 |
+| c:\mon_ecommerce\templates\email\order_confirmation.html  | HTML     |        115 |          0 |         19 |        134 |
+| c:\mon_ecommerce\templates\orders\cart_detail.html        | HTML     |      2,184 |         61 |        344 |      2,589 |
+| c:\mon_ecommerce\templates\orders\checkout.html           | HTML     |      2,988 |         54 |        455 |      3,497 |
+| c:\mon_ecommerce\templates\orders\order_success.html      | HTML     |        898 |         27 |        101 |      1,026 |
+| c:\mon_ecommerce\templates\payments\aitel_payment.html    | HTML     |        125 |          4 |         25 |        154 |
+| c:\mon_ecommerce\templates\payments\cash_on_delivery.html | HTML     |        186 |          6 |         32 |        224 |
+| c:\mon_ecommerce\templates\payments\moov_payment.html     | HTML     |        134 |          4 |         26 |        164 |
+| c:\mon_ecommerce\templates\payments\payment_failed.html   | HTML     |        193 |          8 |         26 |        227 |
+| c:\mon_ecommerce\templates\payments\payment_method.html   | HTML     |        417 |         19 |         53 |        489 |
+| c:\mon_ecommerce\templates\payments\payment_success.html  | HTML     |        120 |          5 |         20 |        145 |
+| c:\mon_ecommerce\templates\shop\category_detail.html      | HTML     |      1,640 |         56 |        189 |      1,885 |
+| c:\mon_ecommerce\templates\shop\product_detail.html       | HTML     |      2,176 |         40 |        322 |      2,538 |
+| c:\mon_ecommerce\templates\shop\product_list.html         | HTML     |      2,432 |         33 |        347 |      2,812 |
+| c:\mon_ecommerce\templates\shop\product_search.html       | HTML     |        667 |         30 |         69 |        766 |
+| c:\mon_ecommerce\templates\test_services.py               | Python   |        101 |         16 |         14 |        131 |
+| Total                                                     |          |     35,799 |        780 |      5,281 |     41,860 |
++-----------------------------------------------------------+----------+------------+------------+------------+------------+

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement Moov Money{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-box {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    
+    .payment-header {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .payment-step {
+        position: relative;
+        padding: 20px;
+        border-left: 4px solid #f39c12;
+        margin-bottom: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .payment-step::before {
+        content: attr(data-step);
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        background: #f39c12;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .phone-input {
+        font-size: 1.5rem;
+        text-align: center;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+    <div class="container">
+        
+        <div class="payment-box shadow-lg">
+            
+            <!-- Header -->
+            <div class="payment-header">
+                <i class="fas fa-mobile-alt fa-4x mb-3"></i>
+                <h2 class="fw-bold mb-2">Paiement Moov Money</h2>
+                <p class="mb-0 opacity-75">Paiement mobile rapide et fiable</p>
+            </div>
+            
+            <!-- Corps -->
+            <div class="p-5">
+                
+                <!-- Montant -->
+                <div class="text-center mb-5">
+                    <div class="text-muted mb-2">Montant à payer</div>
+                    <h1 class="display-3 fw-bold text-warning">50 000 FCFA</h1>
+                </div>
+                
+                <!-- Formulaire -->
+                <form method="post" id="moov-form">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Numéro Moov Money</label>
+                        <input type="tel" 
+                               class="form-control phone-input" 
+                               name="phone" 
+                               placeholder="97 XX XX XX"
+                               maxlength="8"
+                               required>
+                        <small class="text-muted">Entrez votre numéro sans indicatif</small>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-info-circle me-2"></i> Instructions
+                        </h6>
+                        <ol class="mb-0 small ps-3">
+                            <li>Entrez votre numéro Moov Money</li>
+                            <li>Validez la demande de paiement</li>
+                            <li>Vous recevrez une notification sur votre téléphone</li>
+                            <li>Confirmez le paiement avec votre code PIN</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg text-white">
+                            <i class="fas fa-check me-2"></i> Valider le paiement
+                        </button>
+                        <a href="{% url 'payments:payment_method' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Changer de méthode
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('moov-form');
+    const phoneInput = form.querySelector('input[name="phone"]');
+    
+    // Format automatique du numéro
+    phoneInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '');
+    });
+    
+    // Soumission du formulaire
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const phone = phoneInput.value;
+        
+        if (phone.length !== 8) {
+            alert('Veuillez entrer un numéro valide (8 chiffres)');
+            return;
+        }
+        
+        // Vérifier que le numéro commence par 97
+        if (!phone.startsWith('97')) {
+            alert('Le numéro Moov Money doit commencer par 97');
+            return;
+        }
+        
+        // Simulation de traitement
+        const btn = form.querySelector('button[type="submit"]');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Traitement en cours...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            // Redirection vers la page de succès (simulation)
+            window.location.href = "{% url 'payments:payment_success' '12345' %}";
+        }, 3000);
+    });
+});
+</script>
+{% endblock %}

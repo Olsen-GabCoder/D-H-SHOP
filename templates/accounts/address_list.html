@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes Adresses | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Gérez vos adresses de livraison et de facturation. Ajoutez, modifiez ou supprimez vos adresses en toute simplicité.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/address-list.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO ADDRESSES
+     ======================================== -->
+<section class="addresses-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-down">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Mes adresses</span>
+            </div>
+            
+            <!-- Titre + Actions -->
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-title-wrapper">
+                        <div class="hero-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h1 class="hero-title">
+                                Mes <span class="gradient-text">Adresses</span>
+                            </h1>
+                            <p class="hero-subtitle">Gérez vos adresses de livraison et facturation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="{% url 'accounts:address_add' %}" class="btn-hero-action">
+                        <i class="fas fa-plus"></i>
+                        <span>Ajouter une adresse</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     ADDRESSES CONTENT
+     ======================================== -->
+<section class="addresses-section">
+    <div class="container">
+        
+        {% if addresses %}
+        <!-- Stats rapides -->
+        <div class="addresses-stats" data-aos="fade-up">
+            <div class="stat-item">
+                <div class="stat-icon primary">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ addresses|length }}</h4>
+                    <p>Adresse{{ addresses|length|pluralize }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon success">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ addresses|length }}</h4>
+                    <p>Livraison</p>
+                </div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon warning">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>{{ addresses|length }}</h4>
+                    <p>Facturation</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Liste des adresses -->
+        <div class="row g-4">
+            {% for address in addresses %}
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'100' }}">
+                <div class="address-card {% if address.is_default %}is-default{% endif %}">
+                    
+                    <!-- Badge par défaut -->
+                    {% if address.is_default %}
+                    <div class="default-ribbon">
+                        <i class="fas fa-star"></i>
+                        <span>Par défaut</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Header -->
+                    <div class="address-header">
+                        <div class="address-type-badge {{ address.address_type }}">
+                            {% if address.address_type == 'shipping' %}
+                                <i class="fas fa-shipping-fast"></i>
+                                <span>Livraison</span>
+                            {% else %}
+                                <i class="fas fa-file-invoice"></i>
+                                <span>Facturation</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% if address.is_default %}
+                        <div class="default-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Adresse principale</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Nom -->
+                    <h5 class="address-name">
+                        <i class="fas fa-user-circle"></i>
+                        {{ address.full_name }}
+                    </h5>
+                    
+                    <!-- Informations -->
+                    <div class="address-details">
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="detail-text">
+                                <p class="detail-line">{{ address.address_line1 }}</p>
+                                {% if address.address_line2 %}
+                                <p class="detail-line">{{ address.address_line2 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-city"></i>
+                            </div>
+                            <div class="detail-text">
+                                <p class="detail-line">
+                                    {{ address.city }}{% if address.state %}, {{ address.state }}{% endif %}
+                                    {% if address.postal_code %} - {{ address.postal_code }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="detail-text">
+                                <p class="detail-line">{{ address.country }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="detail-text">
+                                <p class="detail-line">{{ address.phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="address-actions">
+                        {% if not address.is_default %}
+                        <form method="post" action="{% url 'accounts:address_set_default' address.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-action set-default" title="Définir par défaut">
+                                <i class="fas fa-star"></i>
+                                <span>Définir par défaut</span>
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'accounts:address_edit' address.pk %}" class="btn-action edit" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                            <span>Modifier</span>
+                        </a>
+                        
+                        <button type="button" 
+                             class="btn-action delete" 
+                             onclick="confirmDelete('{{ address.pk }}')"
+                             title="Supprimer">
+                            <i class="fas fa-trash-alt"></i>
+                         <span>Supprimer</span>
+                        </button>
+
+                        
+                        <!-- Form de suppression caché -->
+                        <form id="delete-form-{{ address.pk }}" 
+                              method="post" 
+                              action="{% url 'accounts:address_delete' address.pk %}" 
+                              style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- État vide -->
+        <div class="empty-state" data-aos="fade-up">
+            <div class="empty-illustration">
+                <div class="empty-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="empty-circle circle-1"></div>
+                <div class="empty-circle circle-2"></div>
+                <div class="empty-circle circle-3"></div>
+            </div>
+            
+            <h3 class="empty-title">Aucune adresse enregistrée</h3>
+            <p class="empty-text">
+                Ajoutez votre première adresse de livraison ou facturation pour faciliter vos futures commandes.
+            </p>
+            
+            <div class="empty-features">
+                <div class="feature-item">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Livraison rapide</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-lock"></i>
+                    <span>Sécurisé</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-edit"></i>
+                    <span>Modifiable</span>
+                </div>
+            </div>
+            
+            <a href="{% url 'accounts:address_add' %}" class="btn-empty-action">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter ma première adresse</span>
+            </a>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content" data-aos="zoom-in">
+        <div class="modal-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h4 class="modal-title">Supprimer cette adresse ?</h4>
+        <p class="modal-text">
+            Cette action est irréversible. Êtes-vous sûr de vouloir supprimer cette adresse ?
+        </p>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal cancel" onclick="closeDeleteModal()">
+                <span>Annuler</span>
+            </button>
+            <button type="button" class="btn-modal confirm" onclick="submitDelete()">
+                <i class="fas fa-trash-alt"></i>
+                <span>Supprimer</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<!-- Address List JS -->
+<script src="{% static 'js/accounts/address-list.js' %}"></script>
+{% endblock %}

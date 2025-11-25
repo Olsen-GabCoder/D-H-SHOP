@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de votre commande {{ order.order_number }}</title>
+    <style>
+        /* RESET CSS POUR EMAIL */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .order-number {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .order-number .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .order-number .number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .items-table th {
+            background-color: #f8f9fa;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .items-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .variant-details {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .totals-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eeeeee;
+        }
+        
+        .totals-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .totals-table .label {
+            text-align: right;
+            font-weight: bold;
+            color: #555;
+            padding-right: 15px;
+        }
+        
+        .totals-table .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .address-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .address-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .invoice-notice {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .invoice-notice strong {
+            color: #2c3e50;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .footer-contact {
+            font-size: 12px;
+            line-height: 1.8;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        .social-links {
+            margin: 15px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .copyright {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 15px;
+        }
+        
+        /* RESPONSIVE */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+            
+            .content {
+                padding: 20px !important;
+            }
+            
+            .items-table, .totals-table {
+                font-size: 12px !important;
+            }
+            
+            .cta-button {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- EN-TÊTE -->
+        <div class="header">
+            <h1>Commande confirmée !</h1>
+            <p>Merci pour votre achat sur {{ shop_name }}</p>
+        </div>
+        
+        <!-- CONTENU PRINCIPAL -->
+        <div class="content">
+            <!-- NUMÉRO DE COMMANDE -->
+            <div class="order-number">
+                <div class="label">Numéro de commande</div>
+                <div class="number">#{{ order.order_number }}</div>
+            </div>
+            
+            <!-- MESSAGE DE BIENVENUE -->
+            <div class="section">
+                <p>Bonjour <strong>{% if customer.user.first_name %}{{ customer.user.get_full_name }}{% else %}{{ customer.user.username }}{% endif %}</strong>,</p>
+                <p>Votre commande a été confirmée avec succès. Nous vous remercions pour votre confiance et vous tiendrons informé de son avancement.</p>
+            </div>
+            
+            <!-- RÉSUMÉ DE LA COMMANDE -->
+            <div class="section">
+                <div class="section-title">
+                    Détails de votre commande
+                </div>
+                
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th class="text-right">Prix unitaire</th>
+                            <th class="text-right">Quantité</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <div class="product-name">{{ item.product_name }}</div>
+                                {% if item.variant_details %}
+                                <div class="variant-details">{{ item.variant_details }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="text-right">{{ item.unit_price|floatformat:0 }} FCFA</td>
+                            <td class="text-right">{{ item.quantity }}</td>
+                            <td class="text-right">{{ item.subtotal|floatformat:0 }} FCFA</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- TOTAUX -->
+                <table class="totals-table">
+                    <tr>
+                        <td class="label">Sous-total :</td>
+                        <td class="amount">{{ order.subtotal|floatformat:0 }} FCFA</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Frais de livraison :</td>
+                        <td class="amount">
+                            {% if order.shipping_cost == 0 %}
+                                <span style="color: #27ae60;">GRATUIT</span>
+                            {% else %}
+                                {{ order.shipping_cost|floatformat:0 }} FCFA
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if order.tax_amount and order.tax_amount > 0 %}
+                    <tr>
+                        <td class="label">Taxes :</td>
+                        <td class="amount">{{ order.tax_amount|floatformat:0 }} FCFA</td>
+                    </tr>
+                    {% endif %}
+                    {% if order.discount_amount and order.discount_amount > 0 %}
+                    <tr>
+                        <td class="label">Réduction :</td>
+                        <td class="amount" style="color: #27ae60;">- {{ order.discount_amount|floatformat:0 }} FCFA</td>
+                    </tr>
+                    {% endif %}
+                    <tr class="total-row">
+                        <td class="label">Total à payer :</td>
+                        <td class="amount">{{ order.total|floatformat:0 }} FCFA</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- INFORMATIONS DE LIVRAISON -->
+            <div class="section">
+                <div class="section-title">
+                    Adresse de livraison
+                </div>
+                <div class="address-box">
+                    <strong>{{ shipping_address.full_name }}</strong>
+                    {{ shipping_address.address_line1 }}<br>
+                    {% if shipping_address.address_line2 %}
+                    {{ shipping_address.address_line2 }}<br>
+                    {% endif %}
+                    {{ shipping_address.city }}{% if shipping_address.postal_code %}, {{ shipping_address.postal_code }}{% endif %}<br>
+                    {{ shipping_address.country }}<br>
+                    Tel: {{ shipping_address.phone }}
+                </div>
+            </div>
+            
+            <!-- INFORMATIONS DE PAIEMENT -->
+            <div class="section">
+                <div class="section-title">
+                    Paiement
+                </div>
+                <p>
+                    <strong>Méthode :</strong> 
+                    {% if order.payment_method == 'cod' %}
+                        Paiement à la livraison (espèces)
+                    {% elif order.payment_method == 'airtel' %}
+                        Airtel Money
+                    {% elif order.payment_method == 'moov' %}
+                        Moov Money
+                    {% elif order.payment_method == 'card' %}
+                        Carte bancaire
+                    {% elif order.payment_method == 'bank_transfer' %}
+                        Virement bancaire
+                    {% else %}
+                        {{ order.payment_method|title }}
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Statut :</strong> 
+                    {% if order.is_paid %}
+                        <span style="color: #27ae60;">Payé</span>
+                    {% else %}
+                        <span style="color: #f39c12;">En attente de paiement</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- FACTURE PDF -->
+            <div class="invoice-notice">
+                <strong>Facture en pièce jointe</strong><br>
+                Votre facture détaillée au format PDF est jointe à cet email. 
+                Conservez-la pour vos archives et pour toute réclamation.
+            </div>
+            
+            <!-- APPEL À L'ACTION -->
+            <div class="section text-center">
+                <p>Vous pouvez suivre l'avancement de votre commande dans votre espace client :</p>
+                <a href="{{ shop_website }}/account/orders/{{ order.order_number }}/" class="cta-button">
+                    Voir ma commande
+                </a>
+            </div>
+            
+            <!-- INFORMATIONS SUPPLÉMENTAIRES -->
+            <div class="section">
+                <div class="section-title">
+                    Informations importantes
+                </div>
+                <ul style="padding-left: 20px; margin: 10px 0;">
+                    <li>Délai de livraison estimé : 2-5 jours ouvrables</li>
+                    <li>Un numéro de suivi vous sera envoyé lorsque votre colis sera expédié</li>
+                    <li>Pour toute question, contactez-nous au {{ shop_phone }}</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- PIED DE PAGE -->
+        <div class="footer">
+            <div class="footer-logo">{{ shop_name }}</div>
+            <div class="footer-contact">
+                {{ shop_address }}<br>
+                Tel: {{ shop_phone }} | Email: {{ shop_email }}<br>
+                Web: {{ shop_website }}
+            </div>
+            
+            {% if social_facebook or social_instagram or social_twitter %}
+            <div class="social-links">
+                {% if social_facebook %}
+                <a href="{{ social_facebook }}">Facebook</a>
+                {% endif %}
+                {% if social_instagram %}
+                <a href="{{ social_instagram }}">Instagram</a>
+                {% endif %}
+                {% if social_twitter %}
+                <a href="{{ social_twitter }}">Twitter</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="copyright">
+                &copy; {% now "Y" %} {{ shop_name }}. Tous droits réservés.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

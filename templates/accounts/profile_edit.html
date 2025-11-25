@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier Mon Profil | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Mettez à jour vos informations personnelles, photo de profil et préférences de notification.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile_edit.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO EDIT PROFIL
+     ======================================== -->
+<section class="edit-hero">
+    <div class="edit-hero-bg"></div>
+    <div class="container">
+        <div class="edit-header" data-aos="fade-up">
+            <a href="{% url 'accounts:profile' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Retour au profil</span>
+            </a>
+            <h1 class="edit-title">Modifier Mon Profil</h1>
+            <p class="edit-subtitle">Mettez à jour vos informations personnelles et préférences</p>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FORMULAIRE D'ÉDITION
+     ======================================== -->
+<section class="section-modern edit-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <form method="post" enctype="multipart/form-data" id="editProfileForm" class="edit-form">
+                    {% csrf_token %}
+                    
+                    <!-- Messages -->
+                    {% if messages %}
+                    <div class="messages-container" data-aos="fade-up">
+                        {% for message in messages %}
+                        <div class="alert-modern alert-{{ message.tags }}">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            <span>{{ message }}</span>
+                            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Photo de Profil -->
+                    <div class="form-card" data-aos="fade-up">
+                        <div class="form-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="header-text">
+                                <h3 class="form-card-title">Photo de Profil</h3>
+                                <p class="form-card-subtitle">Personnalisez votre avatar</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-card-body">
+                            <div class="profile-upload-wrapper">
+                                <div class="profile-preview" id="profilePreview">
+                                    {% if customer.profile_picture %}
+                                        <img src="{{ customer.profile_picture.url }}" alt="Photo" class="preview-image">
+                                    {% else %}
+                                        <div class="preview-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="preview-overlay">
+                                        <i class="fas fa-camera"></i>
+                                        <p>Changer</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="upload-info">
+                                    <h5 class="upload-title">Choisir une photo</h5>
+                                    <p class="upload-description">
+                                        JPG, PNG ou GIF. Taille maximale : 2MB.<br>
+                                        Recommandé : 400x400 pixels minimum.
+                                    </p>
+                                    
+                                    <div class="upload-actions">
+                                        <label for="profilePictureInput" class="btn-upload">
+                                            <i class="fas fa-upload"></i>
+                                            <span>Télécharger une photo</span>
+                                            <input type="file" 
+                                                   id="profilePictureInput" 
+                                                   name="profile_picture" 
+                                                   accept="image/*" 
+                                                   style="display: none;">
+                                        </label>
+                                        
+                                        {% if customer.profile_picture %}
+                                        <button type="button" class="btn-remove" id="removePhotoBtn">
+                                            <i class="fas fa-trash"></i>
+                                            <span>Supprimer</span>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations Personnelles -->
+                    <div class="form-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="form-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="header-text">
+                                <h3 class="form-card-title">Informations Personnelles</h3>
+                                <p class="form-card-subtitle">Vos données de base</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-card-body">
+                            <div class="form-grid">
+                                <div class="form-group-modern">
+                                    <label for="first_name" class="form-label-modern">
+                                        <i class="fas fa-user"></i>
+                                        Prénom
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="first_name" 
+                                           name="first_name" 
+                                           value="{{ user.first_name }}"
+                                           placeholder="Ex: Jean"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="last_name" class="form-label-modern">
+                                        <i class="fas fa-user"></i>
+                                        Nom
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="last_name" 
+                                           name="last_name" 
+                                           value="{{ user.last_name }}"
+                                           placeholder="Ex: Dupont"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="email" class="form-label-modern">
+                                        <i class="fas fa-envelope"></i>
+                                        Adresse email
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control-modern" 
+                                           id="email" 
+                                           name="email" 
+                                           value="{{ user.email }}"
+                                           placeholder="Ex: jean@example.com"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="phone" class="form-label-modern">
+                                        <i class="fas fa-phone"></i>
+                                        Téléphone
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control-modern" 
+                                           id="phone" 
+                                           name="phone" 
+                                           value="{{ customer.phone }}"
+                                           placeholder="Ex: +241 00 00 00 00"
+                                           required>
+                                    <div class="form-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Préférences de Notification -->
+                    <div class="form-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="form-card-header">
+                            <div class="header-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="header-text">
+                                <h3 class="form-card-title">Préférences de Notification</h3>
+                                <p class="form-card-subtitle">Gérez comment vous souhaitez être contacté</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-card-body">
+                            <div class="notification-preferences">
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <div class="preference-icon icon-email">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="preference-text">
+                                            <h5>Notifications par Email</h5>
+                                            <p>Recevez les mises à jour de vos commandes et les offres par email</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               name="email_notifications" 
+                                               {{ customer.email_notifications|yesno:"checked," }}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <div class="preference-icon icon-sms">
+                                            <i class="fas fa-sms"></i>
+                                        </div>
+                                        <div class="preference-text">
+                                            <h5>Notifications par SMS</h5>
+                                            <p>Recevez des alertes par SMS pour les étapes importantes</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               name="sms_notifications" 
+                                               {{ customer.sms_notifications|yesno:"checked," }}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <div class="preference-icon icon-whatsapp">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </div>
+                                        <div class="preference-text">
+                                            <h5>Notifications WhatsApp</h5>
+                                            <p>Recevez des mises à jour instantanées via WhatsApp</p>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               name="whatsapp_notifications" 
+                                               {{ customer.whatsapp_notifications|yesno:"checked," }}>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="form-actions" data-aos="fade-up" data-aos-delay="300">
+                        <a href="{% url 'accounts:profile' %}" class="btn-action btn-cancel">
+                            <i class="fas fa-times"></i>
+                            <span>Annuler</span>
+                        </a>
+                        <button type="submit" class="btn-action btn-save">
+                            <i class="fas fa-save"></i>
+                            <span>Enregistrer les modifications</span>
+                            <span class="btn-loader">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Enregistrement...
+                            </span>
+                        </button>
+                    </div>
+                    
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/profile_edit.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+{% endblock %}

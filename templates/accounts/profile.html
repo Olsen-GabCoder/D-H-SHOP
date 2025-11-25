@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Profil | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Consultez et gérez les informations de votre profil client. Vos commandes, préférences et paramètres de compte.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO PROFIL
+     ======================================== -->
+<section class="profile-hero">
+    <div class="profile-hero-bg"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-3 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="profile-avatar-wrapper">
+                    {% if customer.profile_picture %}
+                        <img src="{{ customer.profile_picture.url }}" alt="Photo de profil" class="profile-avatar">
+                    {% else %}
+                        <div class="profile-avatar profile-avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="avatar-badge">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-9" data-aos="fade-left">
+                <div class="profile-hero-content">
+                    <div class="profile-header-top">
+                        <div>
+                            <span class="profile-badge">
+                                <i class="fas fa-crown"></i>
+                                Membre {{ customer.customer_type|default:"Standard" }}
+                            </span>
+                            <h1 class="profile-name">{{ customer.full_name }}</h1>
+                            <p class="profile-email">
+                                <i class="fas fa-envelope"></i>
+                                {{ customer.email }}
+                            </p>
+                        </div>
+                        <a href="{% url 'accounts:profile_edit' %}" class="btn-edit-profile">
+                            <i class="fas fa-edit"></i>
+                            <span>Modifier</span>
+                        </a>
+                    </div>
+                    
+                    <div class="profile-quick-stats">
+                        <div class="quick-stat-item">
+                            <div class="stat-icon icon-orders">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>{{ customer.total_orders|default:0 }}</h4>
+                                <p>Commandes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-stat-item">
+                            <div class="stat-icon icon-spent">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>{{ customer.total_spent|floatformat:0|default:0 }}</h4>
+                                <p>FCFA dépensés</p>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-stat-item">
+                            <div class="stat-icon icon-member">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h4>{{ customer.created_at|date:"M Y" }}</h4>
+                                <p>Membre depuis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     CONTENU PROFIL
+     ======================================== -->
+<section class="section-modern profile-content-section">
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- COLONNE GAUCHE -->
+            <div class="col-lg-8">
+                
+                <!-- Informations Personnelles -->
+                <div class="profile-card" data-aos="fade-up">
+                    <div class="card-header-modern">
+                        <div class="header-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="header-text">
+                            <h3 class="card-title-modern">Informations Personnelles</h3>
+                            <p class="card-subtitle-modern">Vos données personnelles et de contact</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Nom complet</label>
+                                    <p class="info-value">{{ customer.full_name }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-at"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Nom d'utilisateur</label>
+                                    <p class="info-value">{{ customer.user.username }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Adresse email</label>
+                                    <p class="info-value">{{ customer.email }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Téléphone</label>
+                                    <p class="info-value">{{ customer.phone|default:"Non renseigné" }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if customer.date_of_birth %}
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Date de naissance</label>
+                                    <p class="info-value">{{ customer.date_of_birth|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if customer.address %}
+                            <div class="info-item full-width">
+                                <div class="info-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="info-content">
+                                    <label class="info-label">Adresse</label>
+                                    <p class="info-value">{{ customer.address }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistiques Détaillées -->
+                <div class="profile-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-header-modern">
+                        <div class="header-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="header-text">
+                            <h3 class="card-title-modern">Statistiques d'Achat</h3>
+                            <p class="card-subtitle-modern">Votre activité sur la plateforme</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        <div class="stats-detailed-grid">
+                            <div class="stat-detailed-item">
+                                <div class="stat-detailed-icon bg-primary">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="stat-detailed-content">
+                                    <h4 class="stat-detailed-value">{{ customer.total_orders|default:0 }}</h4>
+                                    <p class="stat-detailed-label">Commandes totales</p>
+                                    <div class="stat-detailed-bar">
+                                        <div class="stat-bar-fill" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-detailed-item">
+                                <div class="stat-detailed-icon bg-success">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-detailed-content">
+                                    <h4 class="stat-detailed-value">{{ customer.completed_orders|default:0 }}</h4>
+                                    <p class="stat-detailed-label">Commandes livrées</p>
+                                    <div class="stat-detailed-bar">
+                                        <div class="stat-bar-fill bg-success" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-detailed-item">
+                                <div class="stat-detailed-icon bg-warning">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-detailed-content">
+                                    <h4 class="stat-detailed-value">{{ customer.pending_orders|default:0 }}</h4>
+                                    <p class="stat-detailed-label">En cours</p>
+                                    <div class="stat-detailed-bar">
+                                        <div class="stat-bar-fill bg-warning" style="width: 45%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-detailed-item">
+                                <div class="stat-detailed-icon bg-info">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="stat-detailed-content">
+                                    <h4 class="stat-detailed-value">{{ customer.total_spent|floatformat:0|default:0 }}</h4>
+                                    <p class="stat-detailed-label">FCFA dépensés</p>
+                                    <div class="stat-detailed-bar">
+                                        <div class="stat-bar-fill bg-info" style="width: 70%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- COLONNE DROITE -->
+            <div class="col-lg-4">
+                
+                <!-- Préférences de Notification -->
+                <div class="profile-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-header-modern">
+                        <div class="header-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="header-text">
+                            <h3 class="card-title-modern">Notifications</h3>
+                            <p class="card-subtitle-modern">Vos préférences</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        <div class="notification-list">
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-icon icon-email">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Email</h5>
+                                        <p>Recevoir par email</p>
+                                    </div>
+                                </div>
+                                <div class="notification-toggle">
+                                    <span class="status-badge {{ customer.email_notifications|yesno:'status-active,status-inactive' }}">
+                                        {{ customer.email_notifications|yesno:"Activé,Désactivé" }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-icon icon-sms">
+                                        <i class="fas fa-sms"></i>
+                                    </div>
+                                    <div>
+                                        <h5>SMS</h5>
+                                        <p>Recevoir par SMS</p>
+                                    </div>
+                                </div>
+                                <div class="notification-toggle">
+                                    <span class="status-badge {{ customer.sms_notifications|yesno:'status-active,status-inactive' }}">
+                                        {{ customer.sms_notifications|yesno:"Activé,Désactivé" }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-item">
+                                <div class="notification-info">
+                                    <div class="notification-icon icon-whatsapp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </div>
+                                    <div>
+                                        <h5>WhatsApp</h5>
+                                        <p>Recevoir par WhatsApp</p>
+                                    </div>
+                                </div>
+                                <div class="notification-toggle">
+                                    <span class="status-badge {{ customer.whatsapp_notifications|yesno:'status-active,status-inactive' }}">
+                                        {{ customer.whatsapp_notifications|yesno:"Activé,Désactivé" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'accounts:profile_edit' %}" class="btn-card-action">
+                            <i class="fas fa-cog"></i>
+                            <span>Gérer les préférences</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Sécurité -->
+                <div class="profile-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-header-modern">
+                        <div class="header-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="header-text">
+                            <h3 class="card-title-modern">Sécurité</h3>
+                            <p class="card-subtitle-modern">Protection du compte</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        <div class="security-status">
+                            <div class="security-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="security-text">
+                                <h5>Compte Sécurisé</h5>
+                                <p>Votre compte est actif et protégé</p>
+                            </div>
+                        </div>
+                        
+                        <div class="security-actions">
+                            <a href="#" class="security-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="action-text">
+                                    <h6>Mot de passe</h6>
+                                    <p>Dernière modification il y a 3 mois</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            
+                            <a href="#" class="security-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="action-text">
+                                    <h6>Authentification 2FA</h6>
+                                    <p>Désactivée</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            
+                            <a href="#" class="security-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="action-text">
+                                    <h6>Activité récente</h6>
+                                    <p>Voir l'historique</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions Rapides -->
+                <div class="profile-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-header-modern">
+                        <div class="header-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="header-text">
+                            <h3 class="card-title-modern">Actions Rapides</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body-modern">
+                        <div class="quick-actions-grid">
+                            <a href="#" class="quick-action-btn">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>Mes commandes</span>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Adresses</span>
+                            </a>
+                            
+                            <a href="#" class="quick-action-btn">
+                                <i class="fas fa-heart"></i>
+                                <span>Favoris</span>
+                            </a>
+                            
+                            <a href="{% url 'core:contact' %}" class="quick-action-btn">
+                                <i class="fas fa-headset"></i>
+                                <span>Support</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+<!-- Profile Page Scripts -->
+<script src="{% static 'js/accounts/profile.js' %}"></script>
+{% endblock %}

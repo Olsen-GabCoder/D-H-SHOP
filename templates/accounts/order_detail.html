@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Commande {{ order.order_number }} | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Détails de votre commande {{ order.order_number }}. Suivez votre livraison en temps réel.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/order_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO DÉTAIL COMMANDE
+     ======================================== -->
+<section class="order-detail-hero no-print">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-up">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'accounts:dashboard' %}">Mon compte</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'accounts:order_list' %}">Mes commandes</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>{{ order.order_number }}</span>
+            </div>
+            
+            <!-- Header principal -->
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-4 mb-lg-0">
+                    <div class="order-hero-info">
+                        <div class="order-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div>
+                            <h1 class="hero-title">Commande {{ order.order_number }}</h1>
+                            <p class="hero-date">
+                                <i class="fas fa-calendar"></i>
+                                <span>Passée le {{ order.created_at|date:"d/m/Y à H:i" }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-5">
+                    <div class="order-hero-actions">
+                        <div class="total-amount">
+                            <span class="amount-label">Total</span>
+                            <span class="amount-value">{{ order.total|floatformat:0 }} FCFA</span>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{% url 'accounts:order_invoice' order.order_number %}" 
+                               class="btn-action invoice">
+                                <i class="fas fa-file-invoice"></i>
+                                <span>Facture</span>
+                            </a>
+                            <a href="{% url 'accounts:order_packing_slip' order.order_number %}" 
+                               class="btn-action packing">
+                                <i class="fas fa-box"></i>
+                                <span>Bon de livraison</span>
+                            </a>
+                            <button class="btn-action print" onclick="window.print()">
+                                <i class="fas fa-print"></i>
+                                <span>Imprimer</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     STATUTS PRINCIPAUX
+     ======================================== -->
+<section class="status-section no-print">
+    <div class="container">
+        <div class="status-grid" data-aos="fade-up">
+            <!-- Statut commande -->
+            <div class="status-card">
+                <div class="status-icon order-status">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="status-info">
+                    <span class="status-label">Statut de la commande</span>
+                    {% if order.status == 'pending' %}
+                        <span class="status-badge pending">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_status_display }}</span>
+                        </span>
+                    {% elif order.status == 'processing' %}
+                        <span class="status-badge processing">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_status_display }}</span>
+                        </span>
+                    {% elif order.status == 'shipped' %}
+                        <span class="status-badge shipped">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_status_display }}</span>
+                        </span>
+                    {% elif order.status == 'delivered' %}
+                        <span class="status-badge delivered">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_status_display }}</span>
+                        </span>
+                    {% elif order.status == 'cancelled' %}
+                        <span class="status-badge cancelled">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_status_display }}</span>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Statut paiement -->
+            <div class="status-card">
+                <div class="status-icon payment-status">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="status-info">
+                    <span class="status-label">Statut du paiement</span>
+                    {% if order.payment_status == 'pending' %}
+                        <span class="status-badge pending">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_payment_status_display }}</span>
+                        </span>
+                    {% elif order.payment_status == 'paid' %}
+                        <span class="status-badge delivered">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_payment_status_display }}</span>
+                        </span>
+                    {% elif order.payment_status == 'failed' %}
+                        <span class="status-badge cancelled">
+                            <span class="badge-dot"></span>
+                            <span>{{ order.get_payment_status_display }}</span>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Mode de paiement -->
+            <div class="status-card">
+                <div class="status-icon method-status">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="status-info">
+                    <span class="status-label">Mode de paiement</span>
+                    <span class="status-value">{{ order.get_payment_method_display|default:"Non spécifié" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     CONTENU PRINCIPAL
+     ======================================== -->
+<section class="order-content-section">
+    <div class="container">
+        <div class="row">
+            
+            <!-- Colonne principale -->
+            <div class="col-lg-8">
+                
+                <!-- Timeline de suivi -->
+                {% if order.status_history.exists %}
+                <div class="content-card" data-aos="fade-up">
+                    <div class="card-header">
+                        <div class="header-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3 class="card-title">Suivi de la commande</h3>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="timeline-modern">
+                            {% for status in order.status_history.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h5>{{ status.get_status_display }}</h5>
+                                        <span class="timeline-date">{{ status.created_at|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                    {% if status.comment %}
+                                    <p class="timeline-text">{{ status.comment }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Articles commandés -->
+                <div class="content-card" data-aos="fade-up">
+                    <div class="card-header">
+                        <div class="header-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3 class="card-title">Articles commandés</h3>
+                        <span class="item-count">{{ order.items.count }} article{{ order.items.count|pluralize }}</span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="products-list">
+                            {% for item in order.items.all %}
+                            <div class="product-item-modern">
+                                <div class="product-image-wrapper">
+                                    {% if item.variant and item.variant.image %}
+                                        <img src="{{ item.variant.image.url }}" alt="{{ item.product_name }}" class="product-img">
+                                    {% elif item.product and item.product.main_image %}
+                                        <img src="{{ item.product.main_image.url }}" alt="{{ item.product_name }}" class="product-img">
+                                    {% else %}
+                                        <div class="product-img-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="product-details">
+                                    <h6 class="product-name">{{ item.product_name }}</h6>
+                                    {% if item.variant_details %}
+                                    <p class="product-variant">{{ item.variant_details }}</p>
+                                    {% endif %}
+                                    <div class="product-quantity">
+                                        <span class="qty-label">Quantité:</span>
+                                        <span class="qty-value">{{ item.quantity }}</span>
+                                        <span class="qty-separator">×</span>
+                                        <span class="qty-price">{{ item.unit_price|floatformat:0 }} FCFA</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-total">
+                                    <span class="total-amount">{{ item.subtotal|floatformat:0 }} FCFA</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adresses -->
+                <div class="row">
+                    <!-- Adresse de livraison -->
+                    <div class="col-md-6 mb-4" data-aos="fade-up">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <div class="header-icon shipping">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <h3 class="card-title">Livraison</h3>
+                            </div>
+                            
+                            <div class="card-body">
+                                {% if order.shipping_address %}
+                                <div class="address-info">
+                                    <p class="address-name">{{ order.shipping_address.full_name }}</p>
+                                    <p class="address-phone">
+                                        <i class="fas fa-phone"></i>
+                                        {{ order.shipping_address.phone }}
+                                    </p>
+                                    <p class="address-line">{{ order.shipping_address.address_line1 }}</p>
+                                    {% if order.shipping_address.address_line2 %}
+                                    <p class="address-line">{{ order.shipping_address.address_line2 }}</p>
+                                    {% endif %}
+                                    <p class="address-line">
+                                        {{ order.shipping_address.city }}{% if order.shipping_address.postal_code %}, {{ order.shipping_address.postal_code }}{% endif %}
+                                    </p>
+                                    <p class="address-country">{{ order.shipping_address.country }}</p>
+                                    
+                                    {% if order.shipping_zone %}
+                                    <div class="shipping-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Zone:</span>
+                                            <span class="detail-value">{{ order.shipping_zone.name }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Type:</span>
+                                            <span class="detail-value">{{ order.get_delivery_type_display }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Délai:</span>
+                                            <span class="detail-value">{{ order.shipping_zone.get_delivery_days_display }}</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <p class="no-data">Adresse non renseignée</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Adresse de facturation -->
+                    <div class="col-md-6 mb-4" data-aos="fade-up">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <div class="header-icon billing">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                                <h3 class="card-title">Facturation</h3>
+                            </div>
+                            
+                            <div class="card-body">
+                                {% if order.billing_address %}
+                                <div class="address-info">
+                                    <p class="address-name">{{ order.billing_address.full_name }}</p>
+                                    <p class="address-phone">
+                                        <i class="fas fa-phone"></i>
+                                        {{ order.billing_address.phone }}
+                                    </p>
+                                    <p class="address-line">{{ order.billing_address.address_line1 }}</p>
+                                    {% if order.billing_address.address_line2 %}
+                                    <p class="address-line">{{ order.billing_address.address_line2 }}</p>
+                                    {% endif %}
+                                    <p class="address-line">
+                                        {{ order.billing_address.city }}{% if order.billing_address.postal_code %}, {{ order.billing_address.postal_code }}{% endif %}
+                                    </p>
+                                    <p class="address-country">{{ order.billing_address.country }}</p>
+                                </div>
+                                {% else %}
+                                <div class="same-address">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Identique à l'adresse de livraison</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Notes client -->
+                        {% if order.customer_notes %}
+                        <div class="content-card mt-4" data-aos="fade-up">
+                            <div class="card-header">
+                                <div class="header-icon notes">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <h3 class="card-title">Notes de livraison</h3>
+                            </div>
+                            
+                            <div class="card-body">
+                                <p class="customer-notes">{{ order.customer_notes }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Sidebar résumé -->
+            <div class="col-lg-4">
+                <div class="sidebar-sticky">
+                    
+                    <!-- Résumé financier -->
+                    <div class="content-card summary-card" data-aos="fade-up">
+                        <div class="card-header">
+                            <div class="header-icon summary">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <h3 class="card-title">Résumé</h3>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="summary-list">
+                                <div class="summary-item">
+                                    <span class="summary-label">Sous-total</span>
+                                    <span class="summary-value">{{ order.subtotal|floatformat:0 }} FCFA</span>
+                                </div>
+                                
+                                <div class="summary-item">
+                                    <span class="summary-label">Livraison</span>
+                                    <span class="summary-value">
+                                        {% if order.shipping_cost > 0 %}
+                                            {{ order.shipping_cost|floatformat:0 }} FCFA
+                                        {% else %}
+                                            <span class="free-shipping">Gratuite</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                {% if order.tax_amount > 0 %}
+                                <div class="summary-item">
+                                    <span class="summary-label">Taxes</span>
+                                    <span class="summary-value">{{ order.tax_amount|floatformat:0 }} FCFA</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if order.discount_amount > 0 %}
+                                <div class="summary-item discount">
+                                    <span class="summary-label">
+                                        <i class="fas fa-tag"></i> Réduction
+                                    </span>
+                                    <span class="summary-value">-{{ order.discount_amount|floatformat:0 }} FCFA</span>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="summary-divider"></div>
+                                
+                                <div class="summary-total">
+                                    <span class="total-label">Total</span>
+                                    <span class="total-value">{{ order.total|floatformat:0 }} FCFA</span>
+                                </div>
+                                
+                                <div class="payment-status-box">
+                                    {% if order.is_paid or order.payment_status == 'paid' %}
+                                        <div class="status-box paid">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>Payé</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="status-box pending-payment">
+                                            <i class="fas fa-clock"></i>
+                                            <span>En attente de paiement</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="content-card actions-card no-print" data-aos="fade-up">
+                        <div class="card-body">
+                            <a href="{% url 'accounts:order_list' %}" class="btn-action-full secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Retour aux commandes</span>
+                            </a>
+                            
+                            {% if order.status == 'pending' or order.status == 'processing' %}
+                            <button class="btn-action-full danger" onclick="cancelOrderModal()">
+                                <i class="fas fa-times"></i>
+                                <span>Annuler la commande</span>
+                            </button>
+                            {% endif %}
+                            
+                            {% if order.status == 'delivered' %}
+                            <button class="btn-action-full success">
+                                <i class="fas fa-star"></i>
+                                <span>Laisser un avis</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts/order_detail.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+{% endblock %}

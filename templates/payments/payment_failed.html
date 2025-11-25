@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement échoué{% endblock %}
+
+{% block extra_css %}
+<style>
+    .failed-animation {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    .error-icon {
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+    }
+    
+    .retry-card {
+        border-left: 4px solid #e74c3c;
+        transition: all 0.3s;
+    }
+    
+    .retry-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="section text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                
+                <!-- Animation d'erreur -->
+                <div class="failed-animation">
+                    <div class="error-icon">
+                        <i class="fas fa-times fa-5x"></i>
+                    </div>
+                </div>
+                
+                <!-- Message -->
+                <h1 class="display-4 fw-bold mb-3 text-danger">Paiement échoué</h1>
+                <p class="lead text-muted mb-5">
+                    Nous n'avons pas pu traiter votre paiement. Veuillez réessayer.
+                </p>
+                
+                <!-- Détails de l'erreur -->
+                {% if payment.failure_reason %}
+                <div class="alert alert-danger mb-5">
+                    <h5 class="fw-bold mb-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Raison de l'échec
+                    </h5>
+                    <p class="mb-0">{{ payment.failure_reason }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Informations du paiement -->
+                <div class="card border-0 shadow-lg mb-5">
+                    <div class="card-body p-5">
+                        <div class="row g-4 text-start">
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Transaction ID</div>
+                                <h5 class="fw-bold">{{ payment.transaction_id }}</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Montant</div>
+                                <h5 class="fw-bold">{{ payment.amount|floatformat:0 }} FCFA</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Méthode tentée</div>
+                                <h6>{{ payment.payment_method.name }}</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Date de la tentative</div>
+                                <h6>{{ payment.created_at|date:"d/m/Y à H:i" }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Suggestions de solutions -->
+                <div class="mb-5">
+                    <h4 class="fw-bold mb-4">Que faire maintenant ?</h4>
+                    
+                    <div class="row g-4 text-start">
+                        <div class="col-md-6">
+                            <div class="card retry-card h-100">
+                                <div class="card-body p-4">
+                                    <div class="text-primary mb-3">
+                                        <i class="fas fa-redo fa-2x"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">Réessayer le paiement</h5>
+                                    <p class="text-muted mb-3">
+                                        Vérifiez votre solde et réessayez avec le même moyen de paiement
+                                    </p>
+                                    <a href="{% url 'payments:payment_method' %}" class="btn btn-primary">
+                                        <i class="fas fa-redo me-2"></i> Réessayer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card retry-card h-100">
+                                <div class="card-body p-4">
+                                    <div class="text-warning mb-3">
+                                        <i class="fas fa-exchange-alt fa-2x"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">Changer de méthode</h5>
+                                    <p class="text-muted mb-3">
+                                        Essayez un autre moyen de paiement disponible
+                                    </p>
+                                    <a href="{% url 'payments:payment_method' %}" class="btn btn-warning text-white">
+                                        <i class="fas fa-exchange-alt me-2"></i> Autre méthode
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conseils -->
+                <div class="card border-0 bg-light mb-4">
+                    <div class="card-body p-4 text-start">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-lightbulb text-warning me-2"></i> Conseils utiles
+                        </h5>
+                        <ul class="mb-0">
+                            <li class="mb-2">Vérifiez que vous avez un solde suffisant</li>
+                            <li class="mb-2">Assurez-vous que votre numéro est correct</li>
+                            <li class="mb-2">Vérifiez votre connexion internet</li>
+                            <li class="mb-0">Contactez votre opérateur en cas de problème persistant</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'orders:cart_detail' %}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-shopping-cart me-2"></i> Retour au panier
+                    </a>
+                    <a href="#" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#supportModal">
+                        <i class="fas fa-headset me-2"></i> Contacter le support
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Support -->
+<div class="modal fade" id="supportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-headset me-2"></i> Contacter le support
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-4">Notre équipe est là pour vous aider :</p>
+                
+                <div class="d-grid gap-3">
+                    <a href="tel:+22890000000" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-phone me-2"></i> Appeler : +228 90 00 00 00
+                    </a>
+                    <a href="https://wa.me/22890000000" class="btn btn-outline-success btn-lg" target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                    </a>
+                    <a href="mailto:support@example.com" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-envelope me-2"></i> Email : support@example.com
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Animation de l'icône d'erreur
+    const errorIcon = document.querySelector('.error-icon');
+    if (errorIcon) {
+        setTimeout(() => {
+            errorIcon.style.transition = 'all 0.5s ease';
+            errorIcon.style.transform = 'rotate(360deg)';
+        }, 500);
+    }
+    
+    // Animation des cartes de retry
+    const retryCards = document.querySelectorAll('.retry-card');
+    retryCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transformcard.style.transform = 'translateY(0)';
+        }, 300 + (index * 150));
+    });
+    
+});
+</script>
+{% endblock %}

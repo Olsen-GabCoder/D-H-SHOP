@@ -1,0 +1,862 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Panier | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Consultez votre panier d'achat et finalisez votre commande en toute sécurité. Paiement 100% sécurisé.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/cart-detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     LOADING OVERLAY
+     ======================================== -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-content">
+        <div class="spinner-modern"></div>
+        <p class="loading-text">Mise à jour du panier...</p>
+    </div>
+</div>
+
+<!-- ========================================
+     HERO PANIER
+     ======================================== -->
+<section class="cart-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-down">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Mon panier</span>
+            </div>
+            
+            <!-- Titre -->
+            <h1 class="hero-title">
+                <span class="title-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </span>
+                Mon <span class="gradient-text">Panier</span>
+            </h1>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     PROGRESS BAR CHECKOUT
+     ======================================== -->
+<section class="progress-section">
+    <div class="container">
+        <div class="checkout-progress" data-aos="fade-up">
+            <div class="progress-step active completed">
+                <div class="step-circle">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <span class="step-label">Panier</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <div class="step-circle">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <span class="step-label">Livraison</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <div class="step-circle">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <span class="step-label">Paiement</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+                <span class="step-label">Confirmation</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     CONTENU DU PANIER
+     ======================================== -->
+<section class="cart-content-section">
+    <div class="container">
+        
+        {% if cart_items %}
+        <div class="row g-4">
+            
+            <!-- ========================================
+                 LISTE DES ARTICLES
+                 ======================================== -->
+            <div class="col-lg-8">
+                
+                <!-- Header -->
+                <div class="cart-header" data-aos="fade-up">
+                    <div class="header-left">
+                        <h2 class="header-title">Articles dans votre panier</h2>
+                        <p class="header-subtitle">
+                            <i class="fas fa-shopping-basket"></i>
+                            <span>{{ cart_items|length }} article{{ cart_items|length|pluralize }}</span>
+                        </p>
+                    </div>
+                    <form method="post" action="{% url 'orders:cart_clear' %}" id="clear-cart-form">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="btn-clear-cart"
+                                onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?');">
+                            <i class="fas fa-trash"></i>
+                            <span>Vider le panier</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Liste des articles -->
+                <div class="cart-items-container">
+                    {% for item in cart_items %}
+                    <div class="cart-item-modern" 
+                         data-item-id="{{ item.variant.id }}"
+                         data-unit-price="{{ item.variant.final_price }}"
+                         data-max-quantity="{{ item.variant.stock.available_quantity }}"
+                         data-aos="fade-up" 
+                         data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                        
+                        <!-- Image -->
+                        <div class="item-image-wrapper">
+                            <a href="{% url 'shop:product_detail' item.variant.product.slug %}" class="item-image-link">
+                                {% if item.variant.image %}
+                                    <img src="{{ item.variant.image.url }}" 
+                                         alt="{{ item.variant.product.name }}" 
+                                         class="item-image"
+                                         loading="lazy">
+                                {% elif item.variant.product.main_image %}
+                                    <img src="{{ item.variant.product.main_image.url }}" 
+                                         alt="{{ item.variant.product.name }}" 
+                                         class="item-image"
+                                         loading="lazy">
+                                {% else %}
+                                    <div class="item-image-placeholder">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                {% endif %}
+                            </a>
+                            {% if item.variant.product.has_discount %}
+                            <span class="discount-badge">-{{ item.variant.product.discount_percentage }}%</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Détails -->
+                        <div class="item-details">
+                            <h5 class="item-name">
+                                <a href="{% url 'shop:product_detail' item.variant.product.slug %}">
+                                    {{ item.variant.product.name }}
+                                </a>
+                            </h5>
+                            
+                            <p class="item-category">
+                                <i class="fas fa-tag"></i>
+                                <span>{{ item.variant.product.category.name }}</span>
+                            </p>
+                            
+                            <!-- Variants -->
+                            <div class="item-variants">
+                                {% if item.variant.size %}
+                                <span class="variant-badge">
+                                    <i class="fas fa-ruler"></i>
+                                    {{ item.variant.size }}
+                                </span>
+                                {% endif %}
+                                {% if item.variant.color %}
+                                <span class="variant-badge">
+                                    <i class="fas fa-palette"></i>
+                                    {{ item.variant.color }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Stock Status -->
+                            <div class="stock-status">
+                                {% if item.variant.stock.is_in_stock %}
+                                <span class="status-badge in-stock">
+                                    <i class="fas fa-check-circle"></i>
+                                    En stock ({{ item.variant.stock.available_quantity }} disponibles)
+                                </span>
+                                {% else %}
+                                <span class="status-badge out-of-stock">
+                                    <i class="fas fa-times-circle"></i>
+                                    Rupture de stock
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Prix & Actions -->
+                        <div class="item-actions">
+                            <!-- Prix unitaire -->
+                            <div class="item-price">
+                                <span class="price-label">Prix unitaire</span>
+                                {% if item.variant.product.has_discount %}
+                                <div class="price-group">
+                                    <span class="old-price">{{ item.variant.base_price|floatformat:0 }} FCFA</span>
+                                    <span class="current-price discount">{{ item.variant.final_price|floatformat:0 }} FCFA</span>
+                                </div>
+                                {% else %}
+                                <span class="current-price">{{ item.variant.final_price|floatformat:0 }} FCFA</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Quantité -->
+                            <div class="quantity-wrapper">
+                                <span class="quantity-label">Quantité</span>
+                                <form method="post" 
+                                      action="{% url 'orders:cart_update' item.variant.id %}" 
+                                      class="quantity-form"
+                                      id="qty-form-{{ item.variant.id }}">
+                                    {% csrf_token %}
+                                    <div class="quantity-selector-modern">
+                                        <button type="button" 
+                                                class="qty-btn decrease"
+                                                data-variant-id="{{ item.variant.id }}"
+                                                {% if item.quantity <= 1 %}disabled{% endif %}
+                                                aria-label="Diminuer la quantité">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" 
+                                               name="quantity" 
+                                               id="qty-input-{{ item.variant.id }}"
+                                               value="{{ item.quantity }}" 
+                                               min="1" 
+                                               max="{{ item.variant.stock.available_quantity }}"
+                                               class="qty-input"
+                                               data-variant-id="{{ item.variant.id }}"
+                                               aria-label="Quantité">
+                                        <button type="button" 
+                                                class="qty-btn increase"
+                                                data-variant-id="{{ item.variant.id }}"
+                                                {% if item.quantity >= item.variant.stock.available_quantity %}disabled{% endif %}
+                                                aria-label="Augmenter la quantité">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                <small class="qty-max">Max: {{ item.variant.stock.available_quantity }}</small>
+                            </div>
+                            
+                            <!-- Sous-total -->
+                            <div class="item-subtotal">
+                                <span class="subtotal-label">Sous-total</span>
+                                <span class="subtotal-value" id="subtotal-{{ item.variant.id }}">
+                                    {{ item.subtotal|floatformat:0 }} FCFA
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Bouton supprimer -->
+                        <form method="post" 
+                              action="{% url 'orders:cart_remove' item.variant.id %}" 
+                              class="remove-form">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="btn-remove-item" 
+                                    title="Retirer cet article"
+                                    aria-label="Retirer {{ item.variant.product.name }} du panier"
+                                    onclick="return confirm('Retirer cet article du panier ?');">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Actions rapides -->
+                <div class="quick-actions" data-aos="fade-up">
+                    <a href="{% url 'shop:product_list' %}" class="btn-quick-action secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Continuer mes achats</span>
+                    </a>
+                </div>
+                
+            </div>
+            
+            <!-- ========================================
+                 RÉSUMÉ DE LA COMMANDE
+                 ======================================== -->
+            <div class="col-lg-4">
+                <div class="summary-sticky">
+                    
+                    <!-- Carte résumé -->
+                    <div class="summary-card" data-aos="fade-left">
+                        <div class="summary-header">
+                            <h4 class="summary-title">
+                                <i class="fas fa-receipt"></i>
+                                <span>Résumé</span>
+                            </h4>
+                        </div>
+                        
+                        <div class="summary-body">
+                            <!-- Sous-total -->
+                            <div class="summary-row">
+                                <span class="row-label">Sous-total ({{ cart_items|length }} article{{ cart_items|length|pluralize }})</span>
+                                <span class="row-value" id="subtotal-display">{{ total|floatformat:0 }} FCFA</span>
+                            </div>
+                            
+                            <!-- Livraison -->
+                            <div class="summary-row">
+                                <span class="row-label">Livraison</span>
+                                <span class="row-value info">Calculée à l'étape suivante</span>
+                            </div>
+                            
+                            <!-- Réduction (masqué par défaut) -->
+                            <div class="summary-row discount-row d-none" id="discount-row">
+                                <span class="row-label">
+                                    <i class="fas fa-tag"></i>
+                                    Réduction
+                                </span>
+                                <span class="row-value discount" id="discount-amount">- 0 FCFA</span>
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <!-- Total -->
+                            <div class="summary-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-display">{{ total|floatformat:0 }} FCFA</span>
+                            </div>
+                            
+                            <!-- Boutons d'action -->
+                            <div class="summary-actions">
+                                <a href="{% url 'orders:checkout' %}" class="btn-checkout">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Passer la commande</span>
+                                </a>
+                                <button type="button" 
+                                        class="btn-coupon" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#couponModal">
+                                    <i class="fas fa-tag"></i>
+                                    <span>Code promo</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Badge sécurité -->
+                            <div class="security-badge">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Paiement 100% sécurisé</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carte livraison -->
+                    <div class="info-card delivery" data-aos="fade-left" data-aos-delay="100">
+                        <div class="card-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="card-content">
+                            <h6 class="card-title">Livraison disponible</h6>
+                            <p class="card-text">Frais calculés selon votre zone</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Carte garanties -->
+                    <div class="guarantees-card" data-aos="fade-left" data-aos-delay="200">
+                        <h6 class="guarantees-title">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Vos garanties</span>
+                        </h6>
+                        <ul class="guarantees-list">
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Paiement sécurisé</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Retours gratuits sous 14 jours</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Service client 7j/7</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>Produits authentiques</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        
+        <!-- ========================================
+             PANIER VIDE
+             ======================================== -->
+        <div class="empty-cart-state" data-aos="zoom-in">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h2 class="empty-title">Votre panier est vide</h2>
+            <p class="empty-text">
+                Vous n'avez pas encore ajouté de produits à votre panier. 
+                Découvrez notre catalogue et trouvez ce qui vous plaît !
+            </p>
+            <div class="empty-actions">
+                <a href="{% url 'shop:product_list' %}" class="btn-empty-action primary">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Découvrir nos produits</span>
+                </a>
+                <a href="{% url 'core:home' %}" class="btn-empty-action secondary">
+                    <i class="fas fa-home"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+            </div>
+        </div>
+        
+        {% endif %}
+        
+    </div>
+</section>
+
+<!-- ========================================
+     MODAL CODE PROMO
+     ======================================== -->
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-modern">
+                <h5 class="modal-title-modern" id="couponModalLabel">
+                    <i class="fas fa-tag"></i>
+                    <span>Code promo</span>
+                </h5>
+                <button type="button" class="btn-close-modern" data-bs-dismiss="modal" aria-label="Fermer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-modern">
+                <form id="coupon-form">
+                    {% csrf_token %}
+                    <div class="coupon-input-group">
+                        <label for="coupon-code-input" class="coupon-label">Entrez votre code</label>
+                        <div class="coupon-input-wrapper">
+                            <input type="text" 
+                                   class="coupon-input" 
+                                   id="coupon-code-input"
+                                   placeholder="Ex: BIENVENUE20"
+                                   autocomplete="off">
+                            <button class="btn-apply-coupon" type="submit">
+                                <i class="fas fa-check"></i>
+                                <span>Appliquer</span>
+                            </button>
+                        </div>
+                        <small class="coupon-hint">Les codes promo ne sont pas sensibles à la casse</small>
+                    </div>
+                    <div id="coupon-message"></div>
+                </form>
+                
+                <div class="available-coupons">
+                    <h6 class="coupons-title">Codes promo disponibles</h6>
+                    <div class="coupons-list">
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code">BIENVENUE20</span>
+                                <span class="coupon-desc">20% de réduction sur votre première commande</span>
+                            </div>
+                            <button type="button" class="btn-quick-apply" data-code="BIENVENUE20">
+                                Appliquer
+                            </button>
+                        </div>
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code success">ETE2024</span>
+                                <span class="coupon-desc">10% sur toute la boutique</span>
+                            </div>
+                            <button type="button" class="btn-quick-apply" data-code="ETE2024">
+                                Appliquer
+                            </button>
+                        </div>
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code danger">FRAIS-PORT</span>
+                                <span class="coupon-desc">Livraison gratuite sans minimum</span>
+                            </div>
+                            <button type="button" class="btn-quick-apply" data-code="FRAIS-PORT">
+                                Appliquer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coupon-conditions">
+                    <h6 class="conditions-title">
+                        <i class="fas fa-info-circle"></i>
+                        Conditions d'utilisation
+                    </h6>
+                    <ul class="conditions-list">
+                        <li>Un seul code promo par commande</li>
+                        <li>Non cumulable avec d'autres offres</li>
+                        <li>Valable uniquement sur les produits éligibles</li>
+                        <li>Soumis aux conditions générales de vente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================
+     SECTION AVANTAGES
+     ======================================== -->
+{% if cart_items %}
+<section class="features-section">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-icon shipping">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h6 class="feature-title">Livraison rapide</h6>
+                <p class="feature-text">Livraison sous 24-48h</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon returns">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <h6 class="feature-title">Retours gratuits</h6>
+                <p class="feature-text">14 jours pour changer d'avis</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon secure">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h6 class="feature-title">Paiement sécurisé</h6>
+                <p class="feature-text">Transactions 100% sûres</p>
+            </div>
+            <div class="feature-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon support">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h6 class="feature-title">Support 7j/7</h6>
+                <p class="feature-text">Assistance client disponible</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+
+<!-- Script du panier -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+    
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    // ===================================
+    // GESTION DES QUANTITÉS
+    // ===================================
+    
+    // Boutons + et -
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const variantId = this.dataset.variantId;
+            const input = document.getElementById(`qty-input-${variantId}`);
+            const form = document.getElementById(`qty-form-${variantId}`);
+            const cartItem = this.closest('.cart-item-modern');
+            
+            if (!input || !form) return;
+            
+            let currentValue = parseInt(input.value) || 1;
+            const min = parseInt(input.min) || 1;
+            const max = parseInt(input.max) || 99;
+            
+            if (this.classList.contains('decrease')) {
+                if (currentValue > min) {
+                    input.value = currentValue - 1;
+                    submitQuantityUpdate(form, cartItem, currentValue - 1);
+                }
+            } else if (this.classList.contains('increase')) {
+                if (currentValue < max) {
+                    input.value = currentValue + 1;
+                    submitQuantityUpdate(form, cartItem, currentValue + 1);
+                }
+            }
+            
+            // Mettre à jour l'état des boutons
+            updateButtonStates(variantId, parseInt(input.value), min, max);
+        });
+    });
+    
+    // Changement direct dans l'input
+    document.querySelectorAll('.qty-input').forEach(input => {
+        let debounceTimer;
+        
+        input.addEventListener('change', function() {
+            clearTimeout(debounceTimer);
+            
+            const variantId = this.dataset.variantId;
+            const form = document.getElementById(`qty-form-${variantId}`);
+            const cartItem = this.closest('.cart-item-modern');
+            
+            let value = parseInt(this.value) || 1;
+            const min = parseInt(this.min) || 1;
+            const max = parseInt(this.max) || 99;
+            
+            // Validation
+            if (value < min) value = min;
+            if (value > max) value = max;
+            this.value = value;
+            
+            debounceTimer = setTimeout(() => {
+                submitQuantityUpdate(form, cartItem, value);
+            }, 500);
+            
+            updateButtonStates(variantId, value, min, max);
+        });
+    });
+    
+    function updateButtonStates(variantId, value, min, max) {
+        const decreaseBtn = document.querySelector(`.qty-btn.decrease[data-variant-id="${variantId}"]`);
+        const increaseBtn = document.querySelector(`.qty-btn.increase[data-variant-id="${variantId}"]`);
+        
+        if (decreaseBtn) decreaseBtn.disabled = value <= min;
+        if (increaseBtn) increaseBtn.disabled = value >= max;
+    }
+    
+    function submitQuantityUpdate(form, cartItem, newQuantity) {
+        // Afficher le loading
+        if (loadingOverlay) loadingOverlay.style.display = 'flex';
+        
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok || response.redirected) {
+                // Mettre à jour le sous-total de l'article
+                const unitPrice = parseFloat(cartItem.dataset.unitPrice) || 0;
+                const newSubtotal = unitPrice * newQuantity;
+                const subtotalElement = cartItem.querySelector('.subtotal-value');
+                if (subtotalElement) {
+                    subtotalElement.textContent = formatPrice(newSubtotal) + ' FCFA';
+                }
+                
+                // Recalculer le total général
+                updateCartTotal();
+                
+                showToast('Quantité mise à jour', 'success');
+            } else {
+                throw new Error('Erreur lors de la mise à jour');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur lors de la mise à jour', 'error');
+            // Recharger la page pour synchroniser
+            setTimeout(() => location.reload(), 1500);
+        })
+        .finally(() => {
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+        });
+    }
+    
+    function updateCartTotal() {
+        let total = 0;
+        document.querySelectorAll('.cart-item-modern').forEach(item => {
+            const subtotalText = item.querySelector('.subtotal-value')?.textContent || '0';
+            const subtotalValue = parseFloat(subtotalText.replace(/[^\d]/g, '')) || 0;
+            total += subtotalValue;
+        });
+        
+        const subtotalDisplay = document.getElementById('subtotal-display');
+        const totalDisplay = document.getElementById('total-display');
+        
+        if (subtotalDisplay) subtotalDisplay.textContent = formatPrice(total) + ' FCFA';
+        if (totalDisplay) totalDisplay.textContent = formatPrice(total) + ' FCFA';
+    }
+    
+    function formatPrice(price) {
+        return Math.round(price).toLocaleString('fr-FR');
+    }
+    
+    // ===================================
+    // TOAST NOTIFICATIONS
+    // ===================================
+    
+    function showToast(message, type = 'info') {
+        const existingToast = document.querySelector('.cart-toast');
+        if (existingToast) existingToast.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = `cart-toast cart-toast-${type}`;
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-times-circle',
+            info: 'fa-info-circle',
+            warning: 'fa-exclamation-triangle'
+        };
+        
+        toast.innerHTML = `
+            <i class="fas ${icons[type] || icons.info}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Animation d'entrée
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+        
+        // Auto-fermeture
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // ===================================
+    // CODE PROMO
+    // ===================================
+    
+    const couponForm = document.getElementById('coupon-form');
+    const couponInput = document.getElementById('coupon-code-input');
+    const couponMessage = document.getElementById('coupon-message');
+    
+    if (couponForm) {
+        couponForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyCoupon(couponInput?.value);
+        });
+    }
+    
+    // Boutons d'application rapide
+    document.querySelectorAll('.btn-quick-apply').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.dataset.code;
+            if (couponInput) couponInput.value = code;
+            applyCoupon(code);
+        });
+    });
+    
+    function applyCoupon(code) {
+        if (!code || !code.trim()) {
+            showCouponMessage('Veuillez entrer un code promo', 'error');
+            return;
+        }
+        
+        // Simulation - à remplacer par un appel API réel
+        showCouponMessage('Code promo appliqué avec succès !', 'success');
+        showToast('Code promo appliqué !', 'success');
+        
+        // Fermer le modal après un délai
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('couponModal'));
+            if (modal) modal.hide();
+        }, 1500);
+    }
+    
+    function showCouponMessage(message, type) {
+        if (!couponMessage) return;
+        
+        couponMessage.className = `coupon-message coupon-message-${type}`;
+        couponMessage.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        couponMessage.style.display = 'flex';
+    }
+    
+    // ===================================
+    // STYLES DYNAMIQUES POUR TOAST
+    // ===================================
+    
+    const toastStyles = document.createElement('style');
+    toastStyles.textContent = `
+        .cart-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .cart-toast.show {
+            transform: translateX(0);
+        }
+        .cart-toast-success {
+            background: #10b981;
+            color: white;
+        }
+        .cart-toast-error {
+            background: #ef4444;
+            color: white;
+        }
+        .cart-toast-info {
+            background: #3b82f6;
+            color: white;
+        }
+        .cart-toast-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .coupon-message {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .coupon-message-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .coupon-message-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    `;
+    document.head.appendChild(toastStyles);
+    
+    console.log('🛒 Cart Detail - Initialized successfully');
+});
+</script>
+{% endblock %}

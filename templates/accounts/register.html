@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inscription - Créer un Compte | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Créez votre compte gratuitement et profitez de tous les avantages de notre plateforme e-commerce au Gabon.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/register.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO REGISTER
+     ======================================== -->
+<section class="register-hero">
+    <div class="register-hero-bg"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="register-wrapper" data-aos="fade-up">
+                    
+                    <!-- Header -->
+                    <div class="register-header">
+                        <div class="header-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h1 class="register-title">Créer un Compte</h1>
+                        <p class="register-subtitle">
+                            Rejoignez-nous et profitez d'une expérience d'achat exceptionnelle
+                        </p>
+                    </div>
+                    
+                    <!-- Main Card -->
+                    <div class="register-card">
+                        
+                        <!-- Progress Steps -->
+                        <div class="progress-steps">
+                            <div class="progress-step active" data-step="1">
+                                <div class="step-circle">
+                                    <span class="step-number">1</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Informations</div>
+                                <div class="step-connector"></div>
+                            </div>
+                            
+                            <div class="progress-step" data-step="2">
+                                <div class="step-circle">
+                                    <span class="step-number">2</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Coordonnées</div>
+                                <div class="step-connector"></div>
+                            </div>
+                            
+                            <div class="progress-step" data-step="3">
+                                <div class="step-circle">
+                                    <span class="step-number">3</span>
+                                    <i class="fas fa-check step-check"></i>
+                                </div>
+                                <div class="step-label">Sécurité</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Messages -->
+                        {% if messages %}
+                        <div class="messages-container">
+                            {% for message in messages %}
+                            <div class="alert-modern alert-{{ message.tags }}">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                                <span>{{ message }}</span>
+                                <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Form -->
+                        <form method="post" action="{% url 'accounts:register' %}" id="registerForm" class="register-form">
+                            {% csrf_token %}
+                            
+                            <!-- STEP 1: Informations Personnelles -->
+                            <div class="form-step active" data-step="1">
+                                <div class="step-header">
+                                    <h3 class="step-title">Informations Personnelles</h3>
+                                    <p class="step-description">Commencez par nous dire qui vous êtes</p>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group-modern">
+                                        <label for="first_name" class="form-label-modern">
+                                            <i class="fas fa-user"></i>
+                                            Prénom
+                                            <span class="required">*</span>
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control-modern" 
+                                               id="first_name" 
+                                               name="first_name" 
+                                               placeholder="Ex: Jean"
+                                               required>
+                                        <div class="form-feedback"></div>
+                                    </div>
+                                    
+                                    <div class="form-group-modern">
+                                        <label for="last_name" class="form-label-modern">
+                                            <i class="fas fa-user"></i>
+                                            Nom
+                                            <span class="required">*</span>
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control-modern" 
+                                               id="last_name" 
+                                               name="last_name" 
+                                               placeholder="Ex: Dupont"
+                                               required>
+                                        <div class="form-feedback"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="username" class="form-label-modern">
+                                        <i class="fas fa-at"></i>
+                                        Nom d'utilisateur
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control-modern" 
+                                           id="username" 
+                                           name="username" 
+                                           placeholder="Ex: jean_dupont"
+                                           required>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Ce nom sera visible publiquement (lettres, chiffres et underscore uniquement)
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-step-modern btn-next" data-next="2">
+                                        <span>Suivant</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- STEP 2: Coordonnées -->
+                            <div class="form-step" data-step="2">
+                                <div class="step-header">
+                                    <h3 class="step-title">Coordonnées</h3>
+                                    <p class="step-description">Comment pouvons-nous vous contacter ?</p>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="email" class="form-label-modern">
+                                        <i class="fas fa-envelope"></i>
+                                        Adresse email
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control-modern" 
+                                           id="email" 
+                                           name="email" 
+                                           placeholder="Ex: jean.dupont@example.com"
+                                           required>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Nous ne partagerons jamais votre email
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="phone" class="form-label-modern">
+                                        <i class="fas fa-phone"></i>
+                                        Téléphone
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control-modern" 
+                                           id="phone" 
+                                           name="phone" 
+                                           placeholder="Ex: +241 00 00 00 00"
+                                           required>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Pour vous contacter concernant vos commandes
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-step-modern btn-prev" data-prev="1">
+                                        <i class="fas fa-arrow-left"></i>
+                                        <span>Précédent</span>
+                                    </button>
+                                    <button type="button" class="btn-step-modern btn-next" data-next="3">
+                                        <span>Suivant</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- STEP 3: Sécurité -->
+                            <div class="form-step" data-step="3">
+                                <div class="step-header">
+                                    <h3 class="step-title">Sécurité du Compte</h3>
+                                    <p class="step-description">Créez un mot de passe sécurisé</p>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="password1" class="form-label-modern">
+                                        <i class="fas fa-lock"></i>
+                                        Mot de passe
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" 
+                                               class="form-control-modern" 
+                                               id="password1" 
+                                               name="password1" 
+                                               placeholder="••••••••"
+                                               required>
+                                        <button type="button" class="password-toggle" data-target="password1">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-strength">
+                                        <div class="strength-bar">
+                                            <div class="strength-fill"></div>
+                                        </div>
+                                        <div class="strength-text">Force du mot de passe</div>
+                                    </div>
+                                    <div class="form-hint">
+                                        <i class="fas fa-info-circle"></i>
+                                        Utilisez au moins 8 caractères avec lettres, chiffres et symboles
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-group-modern">
+                                    <label for="password2" class="form-label-modern">
+                                        <i class="fas fa-lock"></i>
+                                        Confirmer le mot de passe
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" 
+                                               class="form-control-modern" 
+                                               id="password2" 
+                                               name="password2" 
+                                               placeholder="••••••••"
+                                               required>
+                                        <button type="button" class="password-toggle" data-target="password2">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-feedback"></div>
+                                </div>
+                                
+                                <div class="form-checkboxes">
+                                    <div class="checkbox-modern">
+                                        <input type="checkbox" id="accept_terms" required>
+                                        <label for="accept_terms">
+                                            <span class="checkbox-icon">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            <span class="checkbox-text">
+                                                J'accepte les 
+                                                <a href="#" target="_blank">conditions générales</a> 
+                                                et la 
+                                                <a href="#" target="_blank">politique de confidentialité</a>
+                                                <span class="required">*</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="checkbox-modern">
+                                        <input type="checkbox" id="newsletter" name="newsletter">
+                                        <label for="newsletter">
+                                            <span class="checkbox-icon">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                            <span class="checkbox-text">
+                                                Je souhaite recevoir les offres et nouveautés par email
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn-step-modern btn-prev" data-prev="2">
+                                        <i class="fas fa-arrow-left"></i>
+                                        <span>Précédent</span>
+                                    </button>
+                                    <button type="submit" class="btn-step-modern btn-submit">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Créer mon compte</span>
+                                        <span class="btn-loader">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                            Création...
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Footer -->
+                        <div class="register-footer">
+                            <p class="footer-text">
+                                Vous avez déjà un compte ?
+                                <a href="{% url 'accounts:login' %}" class="footer-link">
+                                    Connectez-vous
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </p>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Benefits -->
+                    <div class="register-benefits">
+                        <h4 class="benefits-title">Pourquoi créer un compte ?</h4>
+                        <div class="benefits-grid">
+                            <div class="benefit-item" data-aos="fade-up" data-aos-delay="100">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <div class="benefit-text">
+                                    <h5>Livraison rapide</h5>
+                                    <p>Suivi de vos commandes en temps réel</p>
+                                </div>
+                            </div>
+                            
+                            <div class="benefit-item" data-aos="fade-up" data-aos-delay="200">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="benefit-text">
+                                    <h5>Offres exclusives</h5>
+                                    <p>Accès prioritaire aux promotions</p>
+                                </div>
+                            </div>
+                            
+                            <div class="benefit-item" data-aos="fade-up" data-aos-delay="300">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="benefit-text">
+                                    <h5>Historique</h5>
+                                    <p>Consultez vos achats précédents</p>
+                                </div>
+                            </div>
+                            
+                            <div class="benefit-item" data-aos="fade-up" data-aos-delay="400">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="benefit-text">
+                                    <h5>Sécurisé</h5>
+                                    <p>Vos données sont protégées</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+<!-- Register Page Scripts -->
+<script src="{% static 'js/accounts/register.js' %}"></script>
+{% endblock %}

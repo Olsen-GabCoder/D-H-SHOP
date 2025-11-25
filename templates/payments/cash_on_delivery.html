@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement à la livraison{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cod-box {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .cod-header {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        padding: 50px;
+        text-align: center;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .check-item {
+        padding: 20px;
+        border-left: 4px solid #27ae60;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+    }
+    
+    .check-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .check-item i {
+        font-size: 1.5rem;
+        color: #27ae60;
+    }
+    
+    .amount-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+    <div class="container">
+        
+        <div class="cod-box shadow-lg">
+            
+            <!-- Header -->
+            <div class="cod-header">
+                <i class="fas fa-money-bill-wave fa-5x mb-3"></i>
+                <h1 class="fw-bold mb-2">Paiement à la livraison</h1>
+                <p class="mb-0 opacity-75 fs-5">
+                    Payez en espèces lors de la réception de votre commande
+                </p>
+            </div>
+            
+            <!-- Corps -->
+            <div class="bg-white p-5">
+                
+                <!-- Montant à payer -->
+                <div class="amount-box">
+                    <div class="mb-2 opacity-75">Montant à préparer</div>
+                    <h1 class="display-3 fw-bold mb-0">50 000 FCFA</h1>
+                </div>
+                
+                <!-- Conditions importantes -->
+                <div class="mb-5">
+                    <h4 class="fw-bold mb-4">
+                        <i class="fas fa-clipboard-check text-success me-2"></i>
+                        Conditions importantes
+                    </h4>
+                    
+                    <div class="check-item">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Montant exact</h6>
+                                <p class="mb-0 text-muted small">
+                                    Préparez le montant exact pour faciliter la transaction
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-box me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Vérification du colis</h6>
+                                <p class="mb-0 text-muted small">
+                                    Vous pouvez vérifier le contenu avant de payer
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-id-card me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Pièce d'identité</h6>
+                                <p class="mb-0 text-muted small">
+                                    Une pièce d'identité peut être demandée à la livraison
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="check-item">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-clock me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Présence obligatoire</h6>
+                                <p class="mb-0 text-muted small">
+                                    Soyez disponible à l'adresse indiquée lors de la livraison
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Récapitulatif de livraison -->
+                <div class="card border-0 bg-light mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            Adresse de livraison
+                        </h5>
+                        <p class="mb-2"><strong>Jean Dupont</strong></p>
+                        <p class="mb-2">123 Rue de la République</p>
+                        <p class="mb-2">Lomé, Togo</p>
+                        <p class="mb-0">
+                            <i class="fas fa-phone me-2"></i> +228 90 XX XX XX
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Formulaire de confirmation -->
+                <form method="post" id="cod-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               id="acceptTerms" 
+                               required>
+                        <label class="form-check-label" for="acceptTerms">
+                            J'ai lu et j'accepte les conditions du paiement à la livraison
+                        </label>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Votre commande sera confirmée et préparée immédiatement
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle me-2"></i> Confirmer ma commande
+                        </button>
+                        <a href="{% url 'payments:payment_method' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Changer de méthode
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('cod-form');
+    const checkbox = document.getElementById('acceptTerms');
+    
+    // Soumission du formulaire
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!checkbox.checked) {
+            alert('Veuillez accepter les conditions pour continuer');
+            return;
+        }
+        
+        // Simulation de traitement
+        const btn = form.querySelector('button[type="submit"]');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Confirmation en cours...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            // Redirection vers la page de succès (simulation)
+            window.location.href = "{% url 'payments:payment_success' '12345' %}";
+        }, 2000);
+    });
+    
+    // Animation des check-items
+    const checkItems = document.querySelectorAll('.check-item');
+    checkItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-30px)';
+        
+        setTimeout(() => {
+            item.style.transition = 'all 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, index * 150);
+    });
+});
+</script>
+{% endblock %}

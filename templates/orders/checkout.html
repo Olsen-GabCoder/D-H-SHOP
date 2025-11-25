@@ -1,0 +1,942 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Validation de Commande | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Finalisez votre commande en toute sécurité. Livraison rapide et paiement 100% sécurisé au Gabon.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders/checkout.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     LOADING OVERLAY
+     ======================================== -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner-modern"></div>
+        <p class="loading-text">Traitement en cours...</p>
+    </div>
+</div>
+
+<!-- ========================================
+     HERO CHECKOUT
+     ======================================== -->
+<section class="checkout-hero">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="hero-content" data-aos="fade-down">
+            <!-- Breadcrumb -->
+            <div class="hero-breadcrumb">
+                <a href="{% url 'core:home' %}"><i class="fas fa-home"></i> Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="{% url 'orders:cart_detail' %}">Panier</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Validation de commande</span>
+            </div>
+            
+            <!-- Titre -->
+            <h1 class="hero-title">
+                <span class="title-icon">
+                    <i class="fas fa-lock"></i>
+                </span>
+                Validation <span class="gradient-text">Sécurisée</span>
+            </h1>
+            
+            <!-- Badge sécurité -->
+            <div class="security-badges">
+                <span class="security-badge-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Paiement 100% sécurisé</span>
+                </span>
+                <span class="security-badge-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Livraison garantie</span>
+                </span>
+                <span class="security-badge-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Retours gratuits 14j</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     PROGRESS BAR CHECKOUT
+     ======================================== -->
+<section class="progress-section">
+    <div class="container">
+        <div class="checkout-progress" data-aos="fade-up">
+            <div class="progress-step completed">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+                <span class="step-label">Panier</span>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step active">
+                <div class="step-circle">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <span class="step-label">Commande</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <div class="step-circle">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <span class="step-label">Paiement</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step">
+                <div class="step-circle">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <span class="step-label">Confirmation</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FORMULAIRE DE COMMANDE
+     ======================================== -->
+<section class="checkout-content-section">
+    <div class="container">
+        <form method="post" action="{% url 'orders:checkout_confirm' %}" id="checkout-form">
+            {% csrf_token %}
+            
+            <div class="row g-4">
+                
+                <!-- ========================================
+                     ÉTAPES DE COMMANDE
+                     ======================================== -->
+                <div class="col-lg-8">
+                    
+                    <!-- ÉTAPE 1: ADRESSE DE LIVRAISON -->
+                    <div class="checkout-step-modern" id="step-address" data-aos="fade-up">
+                        <div class="step-header">
+                            <div class="step-number-badge">
+                                <span class="number">1</span>
+                            </div>
+                            <div class="step-info">
+                                <h4 class="step-title">Adresse de livraison</h4>
+                                <p class="step-subtitle">Où souhaitez-vous recevoir votre commande ?</p>
+                            </div>
+                            <div class="step-status">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            {% if addresses %}
+                            <div class="addresses-grid">
+                                {% for address in addresses %}
+                                <label class="address-card-modern {% if forloop.first %}selected{% endif %}">
+                                    <input type="radio" 
+                                           name="address_id" 
+                                           value="{{ address.id }}" 
+                                           {% if forloop.first %}checked{% endif %}
+                                           class="address-radio">
+                                    
+                                    <div class="card-header-section">
+                                        <div class="radio-indicator">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="address-type">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>{{ address.get_address_type_display }}</span>
+                                        </div>
+                                        {% if address.is_default %}
+                                        <span class="badge-default">Par défaut</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="address-details">
+                                        <h6 class="recipient-name">{{ address.full_name }}</h6>
+                                        <p class="address-line">{{ address.address_line1 }}</p>
+                                        {% if address.address_line2 %}
+                                        <p class="address-line">{{ address.address_line2 }}</p>
+                                        {% endif %}
+                                        <p class="address-city">{{ address.city }}, {{ address.postal_code }}</p>
+                                        <p class="address-phone">
+                                            <i class="fas fa-phone"></i>
+                                            {{ address.phone }}
+                                        </p>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                                
+                                <!-- Ajouter une adresse -->
+                                <button type="button" 
+                                        class="address-card-modern add-new"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#addAddressModal">
+                                    <div class="add-icon">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <h6 class="add-title">Ajouter une adresse</h6>
+                                    <p class="add-subtitle">Nouvelle adresse de livraison</p>
+                                </button>
+                            </div>
+                            
+                            {% if detected_zone %}
+                            <div class="zone-detected-alert">
+                                <div class="alert-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h6>Zone de livraison détectée</h6>
+                                    <p>{{ detected_zone.name }} - {{ detected_zone.covered_cities }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% else %}
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h5>Aucune adresse enregistrée</h5>
+                                <p>Veuillez ajouter une adresse de livraison pour continuer</p>
+                                <button type="button" 
+                                        class="btn-add-address"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#addAddressModal">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Ajouter une adresse</span>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- ÉTAPE 2: MODE DE LIVRAISON -->
+                    <div class="checkout-step-modern" id="step-delivery" data-aos="fade-up" data-aos-delay="100">
+                        <div class="step-header">
+                            <div class="step-number-badge">
+                                <span class="number">2</span>
+                            </div>
+                            <div class="step-info">
+                                <h4 class="step-title">Mode de livraison</h4>
+                                <p class="step-subtitle">Choisissez votre méthode de livraison préférée</p>
+                            </div>
+                            <div class="step-status">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            {% if shipping_options %}
+                                {% for option in shipping_options %}
+                                <div class="zone-section">
+                                    <div class="zone-header">
+                                        <div class="zone-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div class="zone-info">
+                                            <h5 class="zone-name">{{ option.zone.name }}</h5>
+                                            <p class="zone-coverage">Couvre : {{ option.zone.covered_cities }}</p>
+                                        </div>
+                                        {% if option.zone == detected_zone %}
+                                        <span class="zone-badge-active">Votre zone</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="shipping-options-grid">
+                                        <!-- Standard -->
+                                        {% if option.rates.standard %}
+                                        <label class="shipping-option-card {% if option.zone == detected_zone and forloop.first %}selected{% endif %}">
+                                            <input type="radio" 
+                                                   name="shipping_rate_id" 
+                                                   value="{{ option.rates.standard.rate.id }}"
+                                                   data-cost="{{ option.rates.standard.cost|floatformat:2 }}"
+                                                   data-is-free="{% if option.rates.standard.is_free %}true{% else %}false{% endif %}"
+                                                   {% if option.zone == detected_zone and forloop.parentloop.first %}checked{% endif %}
+                                                   class="shipping-rate-radio">
+                                            
+                                            <div class="radio-indicator">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            
+                                            {% if option.rates.standard.is_free %}
+                                            <span class="free-badge">
+                                                <i class="fas fa-gift"></i> GRATUIT
+                                            </span>
+                                            {% endif %}
+                                            
+                                            <div class="shipping-header">
+                                                <div class="shipping-icon standard">
+                                                    <i class="fas fa-truck"></i>
+                                                </div>
+                                                <div class="shipping-details">
+                                                    <h6 class="shipping-name">Livraison Standard</h6>
+                                                    <p class="shipping-time">
+                                                        <i class="far fa-clock"></i>
+                                                        {{ option.rates.standard.delivery_days.min }}-{{ option.rates.standard.delivery_days.max }} jours
+                                                    </p>
+                                                </div>
+                                                <div class="shipping-price">
+                                                    {% if option.rates.standard.is_free %}
+                                                    <span class="price-free">Gratuite</span>
+                                                    {% else %}
+                                                    <span class="price-value">{{ option.rates.standard.cost|floatformat:0 }}</span>
+                                                    <span class="price-currency">FCFA</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            {% if option.rates.standard.rate.free_shipping_threshold and not option.rates.standard.is_free %}
+                                            <div class="shipping-threshold">
+                                                <i class="fas fa-info-circle"></i>
+                                                <span>Gratuite dès {{ option.rates.standard.rate.free_shipping_threshold|floatformat:0 }} FCFA</span>
+                                            </div>
+                                            {% endif %}
+                                        </label>
+                                        {% endif %}
+                                        
+                                        <!-- Express -->
+                                        {% if option.rates.express %}
+                                        <label class="shipping-option-card">
+                                            <input type="radio" 
+                                                   name="shipping_rate_id" 
+                                                   value="{{ option.rates.express.rate.id }}"
+                                                   data-cost="{{ option.rates.express.cost|floatformat:2 }}"
+                                                   data-is-free="{% if option.rates.express.is_free %}true{% else %}false{% endif %}"
+                                                   class="shipping-rate-radio">
+                                            
+                                            <div class="radio-indicator">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                            
+                                            {% if option.rates.express.is_free %}
+                                            <span class="free-badge">
+                                                <i class="fas fa-gift"></i> GRATUIT
+                                            </span>
+                                            {% endif %}
+                                            
+                                            <div class="shipping-header">
+                                                <div class="shipping-icon express">
+                                                    <i class="fas fa-shipping-fast"></i>
+                                                </div>
+                                                <div class="shipping-details">
+                                                    <h6 class="shipping-name">Livraison Express</h6>
+                                                    <p class="shipping-time">
+                                                        <i class="far fa-clock"></i>
+                                                        {{ option.rates.express.delivery_days.min }}-{{ option.rates.express.delivery_days.max }} jours
+                                                    </p>
+                                                </div>
+                                                <div class="shipping-price">
+                                                    {% if option.rates.express.is_free %}
+                                                    <span class="price-free">Gratuite</span>
+                                                    {% else %}
+                                                    <span class="price-value">{{ option.rates.express.cost|floatformat:0 }}</span>
+                                                    <span class="price-currency">FCFA</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            
+                                            {% if option.rates.express.rate.free_shipping_threshold and not option.rates.express.is_free %}
+                                            <div class="shipping-threshold">
+                                                <i class="fas fa-info-circle"></i>
+                                                <span>Gratuite dès {{ option.rates.express.rate.free_shipping_threshold|floatformat:0 }} FCFA</span>
+                                            </div>
+                                            {% endif %}
+                                        </label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if not forloop.last %}
+                                <div class="zone-divider"></div>
+                                {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <h5>Aucune zone de livraison disponible</h5>
+                                <p>Nous ne livrons pas encore dans votre région. Contactez-nous pour plus d'informations.</p>
+                                <a href="{% url 'core:contact' %}" class="btn-contact">
+                                    <i class="fas fa-phone"></i>
+                                    <span>Nous contacter</span>
+                                </a>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Instructions de livraison -->
+                            <div class="delivery-notes-section">
+                                <label class="notes-label">
+                                    <i class="fas fa-sticky-note"></i>
+                                    <span>Instructions de livraison (facultatif)</span>
+                                </label>
+                                <textarea class="notes-textarea" 
+                                          name="delivery_notes" 
+                                          rows="4" 
+                                          placeholder="Ex: Sonnez à l'interphone, laissez le colis chez le gardien, appelez avant la livraison..."></textarea>
+                                <small class="notes-hint">Ces instructions aideront notre livreur à vous retrouver facilement</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ÉTAPE 3: MODE DE PAIEMENT -->
+                    <div class="checkout-step-modern" id="step-payment" data-aos="fade-up" data-aos-delay="200">
+                        <div class="step-header">
+                            <div class="step-number-badge">
+                                <span class="number">3</span>
+                            </div>
+                            <div class="step-info">
+                                <h4 class="step-title">Mode de paiement</h4>
+                                <p class="step-subtitle">Toutes les transactions sont 100% sécurisées</p>
+                            </div>
+                            <div class="step-status">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="payment-methods-grid">
+                                <!-- Airtel Money -->
+                                <label class="payment-method-card-modern selected">
+                                    <input type="radio" 
+                                           name="payment_method" 
+                                           value="airtel" 
+                                           checked 
+                                           class="payment-radio">
+                                    
+                                    <div class="radio-indicator">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    
+                                    <div class="payment-icon airtel">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    
+                                    <h5 class="payment-name">Airtel Money</h5>
+                                    <p class="payment-desc">Paiement mobile instantané et sécurisé</p>
+                                    
+                                    <div class="payment-features">
+                                        <span class="feature-item">
+                                            <i class="fas fa-bolt"></i> Instantané
+                                        </span>
+                                        <span class="feature-item">
+                                            <i class="fas fa-shield-alt"></i> Sécurisé
+                                        </span>
+                                    </div>
+                                </label>
+                                
+                                <!-- Moov Money -->
+                                <label class="payment-method-card-modern">
+                                    <input type="radio" 
+                                           name="payment_method" 
+                                           value="moov" 
+                                           class="payment-radio">
+                                    
+                                    <div class="radio-indicator">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    
+                                    <div class="payment-icon moov">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    
+                                    <h5 class="payment-name">Moov Money</h5>
+                                    <p class="payment-desc">Solution de paiement mobile fiable</p>
+                                    
+                                    <div class="payment-features">
+                                        <span class="feature-item">
+                                            <i class="fas fa-bolt"></i> Rapide
+                                        </span>
+                                        <span class="feature-item">
+                                            <i class="fas fa-lock"></i> Crypté
+                                        </span>
+                                    </div>
+                                </label>
+                                
+                                <!-- Paiement à la livraison -->
+                                <label class="payment-method-card-modern">
+                                    <input type="radio" 
+                                           name="payment_method" 
+                                           value="cod" 
+                                           class="payment-radio">
+                                    
+                                    <div class="radio-indicator">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    
+                                    <div class="payment-icon cod">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                    
+                                    <h5 class="payment-name">À la livraison</h5>
+                                    <p class="payment-desc">Payez en espèces à la réception</p>
+                                    
+                                    <div class="payment-features">
+                                        <span class="feature-item">
+                                            <i class="fas fa-hand-holding-usd"></i> Cash
+                                        </span>
+                                        <span class="feature-item">
+                                            <i class="fas fa-check-circle"></i> Simple
+                                        </span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <!-- Badge sécurité paiement -->
+                            <div class="security-info-card">
+                                <div class="security-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="security-content">
+                                    <h6 class="security-title">Paiement 100% sécurisé</h6>
+                                    <p class="security-text">Toutes vos transactions sont cryptées et protégées. Nous ne conservons aucune information bancaire.</p>
+                                </div>
+                                <div class="security-badges">
+                                    <i class="fab fa-cc-visa"></i>
+                                    <i class="fab fa-cc-mastercard"></i>
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ÉTAPE 4: VALIDATION FINALE -->
+                    <div class="checkout-step-modern" id="step-confirm" data-aos="fade-up" data-aos-delay="300">
+                        <div class="step-body">
+                            <!-- Acceptation CGV -->
+                            <div class="terms-section">
+                                <label class="terms-checkbox">
+                                    <input type="checkbox" 
+                                           id="accept-terms" 
+                                           required>
+                                    <span class="checkbox-custom">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="terms-text">
+                                        J'accepte les 
+                                        <a href="#" target="_blank">conditions générales de vente</a> 
+                                        et la 
+                                        <a href="#" target="_blank">politique de confidentialité</a>
+                                    </span>
+                                </label>
+                                
+                                <label class="terms-checkbox">
+                                    <input type="checkbox" 
+                                           id="subscribe-newsletter">
+                                    <span class="checkbox-custom">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span class="terms-text">
+                                        Je souhaite recevoir les offres et nouveautés par email
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            <!-- Boutons d'action -->
+                            <div class="action-buttons">
+                                <button type="submit" class="btn-validate" id="confirm-order-btn">
+                                    <span class="btn-content">
+                                        <i class="fas fa-lock"></i>
+                                        <span>Valider ma commande</span>
+                                    </span>
+                                    <div class="btn-loader">
+                                        <div class="spinner"></div>
+                                        <span>Traitement...</span>
+                                    </div>
+                                </button>
+                                <a href="{% url 'orders:cart_detail' %}" class="btn-back">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Retour au panier</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- ========================================
+                     RÉSUMÉ DE COMMANDE
+                     ======================================== -->
+                <div class="col-lg-4">
+                    <div class="summary-sticky">
+                        
+                        <!-- Carte résumé -->
+                        <div class="summary-card-modern" data-aos="fade-left">
+                            <div class="summary-header">
+                                <h4 class="summary-title">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>Résumé</span>
+                                </h4>
+                                <span class="item-count">{{ cart_items|length }} article{{ cart_items|length|pluralize }}</span>
+                            </div>
+                            
+                            <div class="summary-items">
+                                {% for item in cart_items %}
+                                <div class="summary-item">
+                                    <div class="item-image">
+                                        {% if item.variant.product.main_image %}
+                                        <img src="{{ item.variant.product.main_image.url }}" alt="{{ item.variant.product.name }}">
+                                        {% else %}
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                        {% endif %}
+                                        <span class="item-qty">{{ item.quantity }}</span>
+                                    </div>
+                                    <div class="item-info">
+                                        <h6 class="item-name">{{ item.variant.product.name|truncatewords:4 }}</h6>
+                                        <p class="item-details">{{ item.quantity }} × {{ item.variant.final_price|floatformat:0 }} FCFA</p>
+                                    </div>
+                                    <div class="item-price">
+                                        {{ item.subtotal|floatformat:0 }} FCFA
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <!-- Calculs -->
+                            <div class="summary-calculations">
+                                <div class="calc-row">
+                                    <span class="calc-label">Sous-total</span>
+                                    <span class="calc-value" id="subtotal-display">{{ subtotal|floatformat:0 }} FCFA</span>
+                                </div>
+                                
+                                <div class="calc-row">
+                                    <span class="calc-label">
+                                        <i class="fas fa-truck"></i>
+                                        Livraison
+                                    </span>
+                                    <span class="calc-value shipping" id="shipping-cost-display">
+                                        {% if default_shipping_cost == 0 %}
+                                        <span class="free-tag">Gratuite</span>
+                                        {% else %}
+                                        {{ default_shipping_cost|floatformat:0 }} FCFA
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="calc-row discount d-none" id="discount-row">
+                                    <span class="calc-label">
+                                        <i class="fas fa-tag"></i>
+                                        Réduction
+                                    </span>
+                                    <span class="calc-value discount-value" id="discount-display">- 0 FCFA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <!-- Total -->
+                            <div class="summary-total">
+                                <span class="total-label">Total</span>
+                                <span class="total-value" id="total-display">{{ total|floatformat:0 }} FCFA</span>
+                            </div>
+                            
+                            <!-- Code promo -->
+                            <button type="button" 
+                                    class="btn-promo"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#couponModal">
+                                <i class="fas fa-tag"></i>
+                                <span>Ajouter un code promo</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Garanties -->
+                        <div class="guarantees-card-modern" data-aos="fade-left" data-aos-delay="100">
+                            <h6 class="guarantees-title">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Vos garanties</span>
+                            </h6>
+                            <ul class="guarantees-list">
+                                <li>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Paiement 100% sécurisé</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Retours gratuits sous 14 jours</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Service client 7j/7</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Produits authentiques garantis</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Besoin d'aide -->
+                        <div class="help-card-modern" data-aos="fade-left" data-aos-delay="200">
+                            <div class="help-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h6 class="help-title">Besoin d'aide ?</h6>
+                            <p class="help-text">Notre équipe est disponible pour vous assister</p>
+                            <a href="{% url 'core:contact' %}" class="btn-help">
+                                <i class="fas fa-phone"></i>
+                                <span>Nous contacter</span>
+                            </a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- ========================================
+     MODAL NOUVELLE ADRESSE
+     ======================================== -->
+<div class="modal fade" id="addAddressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header-modern">
+                <h5 class="modal-title-modern">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Ajouter une nouvelle adresse</span>
+                </h5>
+                <button type="button" class="btn-close-modern" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-modern">
+                <form id="add-address-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'orders:checkout' %}">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label-modern">
+                                <i class="fas fa-user"></i>
+                                <span>Nom complet *</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   name="full_name" 
+                                   placeholder="Ex: Jean Dupont"
+                                   required>
+                            <span class="form-error"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label-modern">
+                                <i class="fas fa-phone"></i>
+                                <span>Téléphone *</span>
+                            </label>
+                            <input type="tel" 
+                                   class="form-control-modern" 
+                                   name="phone" 
+                                   placeholder="Ex: +241 06 00 00 00"
+                                   required>
+                            <span class="form-error"></span>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label-modern">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>Adresse ligne 1 *</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   name="address_line1" 
+                                   placeholder="Rue, numéro, quartier"
+                                   required>
+                            <span class="form-error"></span>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label-modern">
+                                <i class="fas fa-building"></i>
+                                <span>Adresse ligne 2</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   name="address_line2" 
+                                   placeholder="Appartement, étage, bâtiment (facultatif)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label-modern">
+                                <i class="fas fa-city"></i>
+                                <span>Ville *</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   name="city" 
+                                   placeholder="Ex: Libreville, Port-Gentil"
+                                   required>
+                            <span class="form-error"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label-modern">
+                                <i class="fas fa-mail-bulk"></i>
+                                <span>Code postal</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern" 
+                                   name="postal_code" 
+                                   placeholder="Facultatif">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label-modern">
+                                <i class="fas fa-tag"></i>
+                                <span>Type d'adresse</span>
+                            </label>
+                            <select class="form-control-modern" name="address_type">
+                                <option value="shipping">Livraison</option>
+                                <option value="billing">Facturation</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-modern">
+                                <input type="checkbox" name="is_default" id="set-default">
+                                <span class="checkbox-custom">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span class="checkbox-label">Adresse par défaut</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer-modern">
+                <button type="button" class="btn-modal-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    <span>Annuler</span>
+                </button>
+                <button type="button" class="btn-modal-primary" id="save-address-btn">
+                    <i class="fas fa-save"></i>
+                    <span>Enregistrer l'adresse</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================
+     MODAL CODE PROMO
+     ======================================== -->
+<div class="modal fade" id="couponModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header-modern">
+                <h5 class="modal-title-modern">
+                    <i class="fas fa-tag"></i>
+                    <span>Code promo</span>
+                </h5>
+                <button type="button" class="btn-close-modern" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-modern">
+                <form id="coupon-form">
+                    {% csrf_token %}
+                    <div class="coupon-input-group">
+                        <label class="coupon-label">Entrez votre code promo</label>
+                        <div class="coupon-input-wrapper">
+                            <input type="text" 
+                                   class="coupon-input" 
+                                   id="coupon-input"
+                                   placeholder="CODE PROMO"
+                                   autocomplete="off">
+                            <button class="btn-apply-coupon" type="submit">
+                                <i class="fas fa-check"></i>
+                                <span>Appliquer</span>
+                            </button>
+                        </div>
+                        <small class="coupon-hint">Les codes ne sont pas sensibles à la casse</small>
+                    </div>
+                    <div id="coupon-message"></div>
+                </form>
+                
+                <div class="available-coupons">
+                    <h6 class="coupons-title">Codes disponibles</h6>
+                    <div class="coupons-list">
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code">BIENVENUE20</span>
+                                <span class="coupon-desc">20% sur votre 1ère commande</span>
+                            </div>
+                            <button class="btn-quick-apply" data-code="BIENVENUE20">
+                                Appliquer
+                            </button>
+                        </div>
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code success">PROMO10</span>
+                                <span class="coupon-desc">10% sur toute la boutique</span>
+                            </div>
+                            <button class="btn-quick-apply" data-code="PROMO10">
+                                Appliquer
+                            </button>
+                        </div>
+                        <div class="coupon-item">
+                            <div class="coupon-info">
+                                <span class="coupon-code danger">LIVRAISON-OFFERTE</span>
+                                <span class="coupon-desc">Livraison gratuite sans minimum</span>
+                            </div>
+                            <button class="btn-quick-apply" data-code="LIVRAISON-OFFERTE">
+                                Appliquer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coupon-conditions">
+                    <h6 class="conditions-title">
+                        <i class="fas fa-info-circle"></i>
+                        Conditions d'utilisation
+                    </h6>
+                    <ul class="conditions-list">
+                        <li>Un seul code promo par commande</li>
+                        <li>Non cumulable avec d'autres offres</li>
+                        <li>Valable sur produits éligibles uniquement</li>
+                        <li>Soumis aux CGV</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    // Initialisation AOS
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+
+    // Correction Checkout Data
+    window.CHECKOUT_DATA = {
+        subtotal: "{{ subtotal|stringformat:'.2f'|escapejs }}",
+        checkoutUrl: "{% url 'orders:checkout' %}",
+        addressAddUrl: "{% url 'accounts:address_add' %}"
+    };
+</script>
+
+
+<script src="{% static 'js/orders/checkout.js' %}"></script>
+{% endblock %}

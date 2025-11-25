@@ -1,0 +1,2087 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact - Nous Contacter | E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Contactez notre équipe pour toute question ou demande d'information. Nous sommes disponibles 24/7 pour vous aider.
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO CONTACT MODERNE
+     ======================================== -->
+<section class="contact-hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="hero-content">
+                    <span class="hero-badge">
+                        <i class="fas fa-envelope"></i> Contactez-nous
+                    </span>
+                    <h1 class="hero-title">
+                        Nous Sommes Là 
+                        <span class="gradient-text">Pour Vous Aider</span>
+                    </h1>
+                    <p class="hero-description">
+                        Notre équipe est disponible pour répondre à toutes vos questions 
+                        et vous accompagner dans votre expérience d'achat.
+                    </p>
+                    
+                    <!-- Stats Hero -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <h4>24/7</h4>
+                            <p>Disponibilité</p>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <h4>&lt;2h</h4>
+                            <p>Temps de réponse</p>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <h4>98%</h4>
+                            <p>Satisfaction</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="hero-illustration">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-headset"></i>
+                        <span>Support 24/7</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat en direct</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-phone"></i>
+                        <span>Appel gratuit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     CARTES DE CONTACT RAPIDE
+     ======================================== -->
+<section class="quick-contact-section">
+    <div class="container">
+        <div class="contact-cards-grid">
+            
+            <!-- Carte Adresse -->
+            <div class="contact-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="card-icon location">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h4 class="card-title">Notre Adresse</h4>
+                <div class="card-content">
+                    <p>123 Avenue de la République</p>
+                    <p>Libreville, Gabon</p>
+                    <p class="text-muted">BP: 12345</p>
+                </div>
+                <a href="#map-section" class="card-action">
+                    <span>Voir la carte</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <!-- Carte Téléphone -->
+            <div class="contact-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-icon phone">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h4 class="card-title">Téléphone</h4>
+                <div class="card-content">
+                    <p><strong>Ventes:</strong> +241 01 23 45 67</p>
+                    <p><strong>Support:</strong> +241 07 89 01 23</p>
+                    <p><strong>WhatsApp:</strong> +241 06 54 32 10</p>
+                </div>
+                <a href="tel:+24101234567" class="card-action">
+                    <span>Appeler maintenant</span>
+                    <i class="fas fa-phone"></i>
+                </a>
+            </div>
+            
+            <!-- Carte Email -->
+            <div class="contact-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-icon email">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h4 class="card-title">Email</h4>
+                <div class="card-content">
+                    <p><strong>Général:</strong></p>
+                    <p>contact@ecommerce.ga</p>
+                    <p><strong>Support:</strong></p>
+                    <p>support@ecommerce.ga</p>
+                </div>
+                <a href="mailto:contact@ecommerce.ga" class="card-action">
+                    <span>Envoyer un email</span>
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FORMULAIRE DE CONTACT
+     ======================================== -->
+<section class="form-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                
+                <div class="form-card" data-aos="zoom-in">
+                    <div class="form-header">
+                        <div class="form-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <h2 class="form-title">Envoyez-nous un message</h2>
+                        <p class="form-subtitle">
+                            Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais
+                        </p>
+                    </div>
+                    
+                    <!-- Messages Django -->
+                    {% if messages %}
+                    <div class="messages-container">
+                        {% for message in messages %}
+                        <div class="alert-modern alert-{{ message.tags }}">
+                            <div class="alert-icon">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}times-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                            </div>
+                            <div class="alert-content">
+                                <p>{{ message }}</p>
+                            </div>
+                            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'core:contact' %}" id="contact-form" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-grid">
+                            
+                            <!-- Nom -->
+                            <div class="form-group-modern">
+                                <label for="name" class="form-label-modern">
+                                    <i class="fas fa-user"></i>
+                                    <span>Nom complet</span>
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-input-modern" 
+                                       id="name" 
+                                       name="name" 
+                                       placeholder="Entrez votre nom complet"
+                                       value="{{ name }}"
+                                       required>
+                                <div class="form-error" id="name-error"></div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="form-group-modern">
+                                <label for="email" class="form-label-modern">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Adresse email</span>
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="email" 
+                                       class="form-input-modern" 
+                                       id="email" 
+                                       name="email" 
+                                       placeholder="votre@email.com"
+                                       value="{{ email }}"
+                                       required>
+                                <div class="form-error" id="email-error"></div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Sujet -->
+                        <div class="form-group-modern">
+                            <label for="subject" class="form-label-modern">
+                                <i class="fas fa-tag"></i>
+                                <span>Sujet</span>
+                                <span class="required">*</span>
+                            </label>
+                            <select class="form-input-modern" id="subject" name="subject" required>
+                                <option value="">-- Choisissez un sujet --</option>
+                                <option value="Commande" {% if subject == "Commande" %}selected{% endif %}>
+                                    Question sur une commande
+                                </option>
+                                <option value="Produit" {% if subject == "Produit" %}selected{% endif %}>
+                                    Question sur un produit
+                                </option>
+                                <option value="Livraison" {% if subject == "Livraison" %}selected{% endif %}>
+                                    Problème de livraison
+                                </option>
+                                <option value="Paiement" {% if subject == "Paiement" %}selected{% endif %}>
+                                    Question sur le paiement
+                                </option>
+                                <option value="Retour" {% if subject == "Retour" %}selected{% endif %}>
+                                    Demande de retour/remboursement
+                                </option>
+                                <option value="Partenariat" {% if subject == "Partenariat" %}selected{% endif %}>
+                                    Proposition de partenariat
+                                </option>
+                                <option value="Autre" {% if subject == "Autre" %}selected{% endif %}>
+                                    Autre demande
+                                </option>
+                            </select>
+                            <div class="form-error" id="subject-error"></div>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="form-group-modern">
+                            <label for="message" class="form-label-modern">
+                                <i class="fas fa-comment"></i>
+                                <span>Votre message</span>
+                                <span class="required">*</span>
+                            </label>
+                            <textarea class="form-input-modern" 
+                                      id="message" 
+                                      name="message" 
+                                      rows="6" 
+                                      placeholder="Décrivez votre demande en détail..."
+                                      required>{{ message }}</textarea>
+                            <div class="char-counter">
+                                <span id="char-count">0</span> / 500 caractères
+                            </div>
+                            <div class="form-error" id="message-error"></div>
+                        </div>
+                        
+                        <!-- Consent -->
+                        <div class="form-group-modern">
+                            <label class="checkbox-modern">
+                                <input type="checkbox" id="consent" name="consent" required>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label">
+                                    J'accepte que mes données personnelles soient utilisées pour traiter ma demande. 
+                                    <a href="#">Politique de confidentialité</a>
+                                </span>
+                            </label>
+                            <div class="form-error" id="consent-error"></div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn-submit-modern" id="submit-btn">
+                            <span class="btn-text">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Envoyer le message</span>
+                            </span>
+                            <span class="btn-loading" style="display: none;">
+                                <span class="spinner"></span>
+                                <span>Envoi en cours...</span>
+                            </span>
+                        </button>
+                        
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     HORAIRES & CARTE
+     ======================================== -->
+<section class="hours-map-section" id="map-section">
+    <div class="container">
+        <div class="row g-4">
+            
+            <!-- Horaires -->
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="hours-card">
+                    <div class="hours-header">
+                        <div class="header-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <h3 class="hours-title">Nos horaires d'ouverture</h3>
+                            <p class="hours-subtitle">Notre équipe est disponible pour vous répondre</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hours-list">
+                        <div class="hours-item">
+                            <div class="day-info">
+                                <i class="far fa-calendar"></i>
+                                <span>Lundi - Vendredi</span>
+                            </div>
+                            <span class="time-badge open">8h00 - 18h00</span>
+                        </div>
+                        
+                        <div class="hours-item">
+                            <div class="day-info">
+                                <i class="far fa-calendar"></i>
+                                <span>Samedi</span>
+                            </div>
+                            <span class="time-badge open">9h00 - 16h00</span>
+                        </div>
+                        
+                        <div class="hours-item">
+                            <div class="day-info">
+                                <i class="far fa-calendar"></i>
+                                <span>Dimanche</span>
+                            </div>
+                            <span class="time-badge closed">Fermé</span>
+                        </div>
+                    </div>
+                    
+                    <div class="hours-alert">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Support d'urgence :</strong>
+                            <p>Pour les urgences, contactez-nous sur WhatsApp 24h/24</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Carte -->
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="map-card">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.6729492718844!2d9.4672676!3d0.4162194!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMMKwMjQnNTguNCJOIDnCsDI4JzAyLjIiRQ!5e0!3m2!1sfr!2sga!4v1234567890" 
+                        width="100%" 
+                        height="450" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     FAQ RAPIDE
+     ======================================== -->
+<section class="faq-quick-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">FAQ</span>
+            <h2 class="section-title">Questions fréquentes</h2>
+            <p class="section-subtitle">Vous trouverez peut-être votre réponse ici</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="faq-accordion">
+                    
+                    <div class="faq-item" data-aos="fade-up" data-aos-delay="0">
+                        <div class="faq-question" data-faq-toggle>
+                            <div class="faq-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="faq-text">Quel est le délai de réponse moyen ?</span>
+                            <div class="faq-toggle-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="faq-answer" data-faq-content>
+                            <div class="faq-answer-inner">
+                                Nous nous engageons à répondre à toutes les demandes dans un délai de 24 heures ouvrables. 
+                                Pour les questions urgentes, nous vous recommandons de nous contacter par téléphone ou WhatsApp.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+                        <div class="faq-question" data-faq-toggle>
+                            <div class="faq-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="faq-text">Comment suivre ma commande ?</span>
+                            <div class="faq-toggle-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="faq-answer" data-faq-content>
+                            <div class="faq-answer-inner">
+                                Vous pouvez suivre votre commande en vous connectant à votre compte et en accédant à la section 
+                                "Mes commandes". Vous recevrez également des notifications par email à chaque étape de la livraison.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+                        <div class="faq-question" data-faq-toggle>
+                            <div class="faq-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="faq-text">Quels sont les moyens de paiement acceptés ?</span>
+                            <div class="faq-toggle-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="faq-answer" data-faq-content>
+                            <div class="faq-answer-inner">
+                                Nous acceptons Airtel Money, Moov Money et le paiement à la livraison (cash). 
+                                Tous les paiements en ligne sont 100% sécurisés.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                        <div class="faq-question" data-faq-toggle>
+                            <div class="faq-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="faq-text">Comment faire un retour ou une réclamation ?</span>
+                            <div class="faq-toggle-icon">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="faq-answer" data-faq-content>
+                            <div class="faq-answer-inner">
+                                Pour initier un retour, contactez-nous dans les 14 jours suivant la réception de votre commande. 
+                                Notre équipe vous guidera à travers le processus de retour et de remboursement.
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="text-center mt-4" data-aos="fade-up">
+                    <a href="{% url 'core:faq' %}" class="btn-view-all-faq">
+                        <i class="fas fa-list"></i>
+                        <span>Voir toutes les questions fréquentes</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     RÉSEAUX SOCIAUX
+     ======================================== -->
+<section class="social-section">
+    <div class="social-bg"></div>
+    <div class="container">
+        <div class="text-center" data-aos="zoom-in">
+            <div class="social-icon-main">
+                <i class="fas fa-share-alt"></i>
+            </div>
+            <h2 class="social-title">Suivez-nous sur les réseaux sociaux</h2>
+            <p class="social-subtitle">
+                Restez connecté et ne manquez aucune de nos actualités et promotions
+            </p>
+            
+            <div class="social-buttons">
+                <a href="#" class="social-btn facebook" data-aos="zoom-in" data-aos-delay="0">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-btn twitter" data-aos="zoom-in" data-aos-delay="100">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-btn instagram" data-aos="zoom-in" data-aos-delay="200">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-btn linkedin" data-aos="zoom-in" data-aos-delay="300">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="social-btn whatsapp" data-aos="zoom-in" data-aos-delay="400">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     STYLES CSS
+     ======================================== -->
+<style>
+/* ===================================
+   VARIABLES
+   =================================== */
+:root {
+    --primary-color: #e74c3c;
+    --primary-hover: #ff6b6b;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --danger-color: #dc3545;
+    --dark-bg: #1a1a2e;
+    --darker-bg: #16213e;
+    --text-dark: #2c3e50;
+    --text-muted: #6c757d;
+    --bg-light: #f8f9fa;
+    --border-color: #e9ecef;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================================
+   HERO CONTACT
+   =================================== */
+.contact-hero {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+/* Hero Stats */
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+}
+
+.stat-item h4 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.stat-item p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.stat-divider {
+    width: 2px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Hero Illustration */
+.hero-illustration {
+    position: relative;
+    height: 400px;
+}
+
+.floating-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px 25px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+    font-weight: 600;
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.floating-card.card-1 {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-card.card-2 {
+    top: 50%;
+    right: 10%;
+    animation-delay: -1s;
+}
+
+.floating-card.card-3 {
+    bottom: 10%;
+    left: 30%;
+    animation-delay: -2s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ===================================
+   CARTES DE CONTACT RAPIDE
+   =================================== */
+.quick-contact-section {
+    background: var(--bg-light);
+    padding: 60px 0;
+    margin-top: -60px;
+    position: relative;
+    z-index: 10;
+}
+
+.contact-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.contact-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+    transform: scaleX(0);
+    transition: var(--transition);
+}
+
+.contact-card:hover::before {
+    transform: scaleX(1);
+}
+
+.contact-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    transition: var(--transition);
+}
+
+.card-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.card-icon.location {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+}
+
+.card-icon.phone {
+    background: linear-gradient(135deg, var(--success-color), #20c997);
+}
+
+.card-icon.email {
+    background: linear-gradient(135deg, var(--info-color), #5bc0de);
+}
+
+.contact-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.card-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
+.card-content {
+    margin-bottom: 25px;
+}
+
+.card-content p {
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.card-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--bg-light);
+    border-radius: 25px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.card-action:hover {
+    background: var(--primary-color);
+    color: white;
+    gap: 12px;
+}
+
+/* ===================================
+   FORMULAIRE DE CONTACT
+   =================================== */
+.form-section {
+    background: white;
+    padding: 80px 0;
+}
+
+.form-card {
+    background: white;
+    border-radius: 25px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.form-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+}
+
+.form-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.form-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.form-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* Messages */
+.messages-container {
+    margin-bottom: 30px;
+}
+
+.alert-modern {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    animation: slideInDown 0.3s ease;
+}
+
+.alert-modern.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.alert-modern.alert-error,
+.alert-modern.alert-danger {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.alert-modern.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.alert-modern.alert-info {
+    background: rgba(23, 162, 184, 0.1);
+    border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.alert-icon {
+    flex-shrink: 0;
+}
+
+.alert-success .alert-icon i { color: var(--success-color); }
+.alert-error .alert-icon i,
+.alert-danger .alert-icon i { color: var(--danger-color); }
+.alert-warning .alert-icon i { color: var(--warning-color); }
+.alert-info .alert-icon i { color: var(--info-color); }
+
+.alert-icon i {
+    font-size: 1.25rem;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 5px;
+    transition: var(--transition);
+}
+
+.alert-close:hover {
+    color: var(--text-dark);
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.form-group-modern {
+    margin-bottom: 25px;
+}
+
+.form-label-modern {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.form-label-modern i {
+    color: var(--primary-color);
+}
+
+.required {
+    color: var(--danger-color);
+    margin-left: 4px;
+}
+
+.form-input-modern {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background: white;
+}
+
+.form-input-modern:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+}
+
+.form-input-modern.error {
+    border-color: var(--danger-color);
+}
+
+textarea.form-input-modern {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.char-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.form-error {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    display: none;
+}
+
+.form-error.show {
+    display: block;
+}
+
+/* Checkbox Modern */
+.checkbox-modern {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-modern input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    transition: var(--transition);
+    flex-shrink: 0;
+    position: relative;
+    margin-top: 2px;
+}
+
+.checkbox-modern input:checked ~ .checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-modern input:checked ~ .checkmark::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.8rem;
+}
+
+.checkbox-label {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.checkbox-label a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkbox-label a:hover {
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-submit-modern {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-submit-modern:hover::before {
+    left: 100%;
+}
+
+.btn-submit-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(231, 76, 60, 0.4);
+}
+
+.btn-submit-modern:active {
+    transform: translateY(0);
+}
+
+.btn-submit-modern:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-text,
+.btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===================================
+   HORAIRES & CARTE
+   =================================== */
+.hours-map-section {
+    background: var(--bg-light);
+    padding: 80px 0;
+}
+
+.hours-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.hours-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-icon i {
+    font-size: 1.75rem;
+    color: white;
+}
+
+.hours-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.hours-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.hours-list {
+    margin-bottom: 25px;
+}
+
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--bg-light);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: var(--transition);
+}
+
+.hours-item:hover {
+    background: rgba(231, 76, 60, 0.05);
+}
+
+.day-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.day-info i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.time-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.time-badge.open {
+    background: rgba(40, 167, 69, 0.15);
+    color: var(--success-color);
+}
+
+.time-badge.closed {
+    background: rgba(220, 53, 69, 0.15);
+    color: var(--danger-color);
+}
+
+.hours-alert {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(23, 162, 184, 0.1);
+    border-left: 4px solid var(--info-color);
+    border-radius: 12px;
+}
+
+.hours-alert i {
+    color: var(--info-color);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.hours-alert strong {
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.hours-alert p {
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.map-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.map-card iframe {
+    border-radius: 20px;
+}
+
+/* ===================================
+   FAQ RAPIDE
+   =================================== */
+.faq-quick-section {
+    background: white;
+    padding: 80px 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--primary-color);
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+}
+
+.faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.faq-item {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.faq-item:hover {
+    border-color: var(--primary-color);
+}
+
+.faq-item.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.15);
+}
+
+.faq-question {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.faq-question:hover {
+    background: rgba(231, 76, 60, 0.02);
+}
+
+.faq-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.faq-icon i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.faq-text {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1.05rem;
+}
+
+.faq-toggle-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.faq-toggle-icon i {
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.faq-item.active .faq-toggle-icon {
+    background: var(--primary-color);
+    transform: rotate(180deg);
+}
+
+.faq-item.active .faq-toggle-icon i {
+    color: white;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 300px;
+}
+
+.faq-answer-inner {
+    padding: 0 25px 25px 80px;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+.btn-view-all-faq {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 30px;
+    background: var(--bg-light);
+    border: 2px solid var(--border-color);
+    border-radius: 50px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-view-all-faq:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    gap: 16px;
+}
+
+/* ===================================
+   RÉSEAUX SOCIAUX
+   =================================== */
+.social-section {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.social-icon-main {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-icon-main i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.social-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.social-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 40px;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.75rem;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.social-btn:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.social-btn.facebook {
+    background: linear-gradient(135deg, #3b5998, #2d4373);
+}
+
+.social-btn.twitter {
+    background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+}
+
+.social-btn.instagram {
+    background: linear-gradient(135deg, #e4405f, #c13584);
+}
+
+.social-btn.linkedin {
+    background: linear-gradient(135deg, #0077b5, #005e94);
+}
+
+.social-btn.whatsapp {
+    background: linear-gradient(135deg, #25d366, #128c7e);
+}
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 991px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        width: 100%;
+        height: 2px;
+    }
+    
+    .hero-illustration {
+        height: 300px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .contact-hero {
+        padding: 80px 0 60px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .contact-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-card {
+        padding: 30px 20px;
+    }
+    
+    .form-title {
+        font-size: 1.75rem;
+    }
+    
+    .hours-card {
+        padding: 30px 20px;
+    }
+    
+    .faq-answer-inner {
+        padding: 0 20px 20px 60px;
+    }
+    
+    .social-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+    
+    .hero-stats {
+        padding: 20px;
+    }
+    
+    .floating-card {
+        padding: 15px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+</style>
+
+<!-- ========================================
+     JAVASCRIPT
+     ======================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ============================================
+    // ÉLÉMENTS
+    // ============================================
+    const contactForm = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const messageInput = document.getElementById('message');
+    const charCount = document.getElementById('char-count');
+    
+    // ============================================
+    // COMPTEUR DE CARACTÈRES
+    // ============================================
+    if (messageInput && charCount) {
+        messageInput.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            if (count > 500) {
+                charCount.style.color = 'var(--danger-color)';
+            } else if (count > 400) {
+                charCount.style.color = 'var(--warning-color)';
+            } else {
+                charCount.style.color = 'var(--text-muted)';
+            }
+        });
+        
+        // Initialiser le compteur
+        charCount.textContent = messageInput.value.length;
+    }
+    
+    // ============================================
+    // VALIDATION EN TEMPS RÉEL
+    // ============================================
+    function validateName() {
+        const nameInput = document.getElementById('name');
+        const value = nameInput.value.trim();
+        const errorDiv = document.getElementById('name-error');
+        
+        if (!value) {
+            nameInput.classList.add('error');
+            errorDiv.textContent = 'Le nom est requis';
+            errorDiv.classList.add('show');
+            return false;
+        } else if (value.length < 3) {
+            nameInput.classList.add('error');
+            errorDiv.textContent = 'Le nom doit contenir au moins 3 caractères';
+            errorDiv.classList.add('show');
+            return false;
+        } else {
+            nameInput.classList.remove('error');
+            errorDiv.classList.remove('show');
+            return true;
+        }
+    }
+    
+    function validateEmail() {
+        const emailInput = document.getElementById('email');
+        const value = emailInput.value.trim();
+        const errorDiv = document.getElementById('email-error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!value) {
+            emailInput.classList.add('error');
+            errorDiv.textContent = 'L\'email est requis';
+            errorDiv.classList.add('show');
+            return false;
+        } else if (!emailRegex.test(value)) {
+            emailInput.classList.add('error');
+            errorDiv.textContent = 'Veuillez entrer un email valide';
+            errorDiv.classList.add('show');
+            return false;
+        } else {
+            emailInput.classList.remove('error');
+            errorDiv.classList.remove('show');
+            return true;
+        }
+    }
+    
+    function validateSubject() {
+        const subjectInput = document.getElementById('subject');
+        const value = subjectInput.value;
+        const errorDiv = document.getElementById('subject-error');
+        
+        if (!value) {
+            subjectInput.classList.add('error');
+            errorDiv.textContent = 'Veuillez choisir un sujet';
+            errorDiv.classList.add('show');
+            return false;
+        } else {
+            subjectInput.classList.remove('error');
+            errorDiv.classList.remove('show');
+            return true;
+        }
+    }
+    
+    function validateMessage() {
+        const value = messageInput.value.trim();
+        const errorDiv = document.getElementById('message-error');
+        
+        if (!value) {
+            messageInput.classList.add('error');
+            errorDiv.textContent = 'Le message est requis';
+            errorDiv.classList.add('show');
+            return false;
+        } else if (value.length < 20) {
+            messageInput.classList.add('error');
+            errorDiv.textContent = 'Le message doit contenir au moins 20 caractères';
+            errorDiv.classList.add('show');
+            return false;
+        } else if (value.length > 500) {
+            messageInput.classList.add('error');
+            errorDiv.textContent = 'Le message ne doit pas dépasser 500 caractères';
+            errorDiv.classList.add('show');
+            return false;
+        } else {
+            messageInput.classList.remove('error');
+            errorDiv.classList.remove('show');
+            return true;
+        }
+    }
+    
+    function validateConsent() {
+        const consentInput = document.getElementById('consent');
+        const errorDiv = document.getElementById('consent-error');
+        
+        if (!consentInput.checked) {
+            errorDiv.textContent = 'Vous devez accepter la politique de confidentialité';
+            errorDiv.classList.add('show');
+            return false;
+        } else {
+            errorDiv.classList.remove('show');
+            return true;
+        }
+    }
+    
+    // Validation à la saisie
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const subjectInput = document.getElementById('subject');
+    const consentInput = document.getElementById('consent');
+    
+    if (nameInput) {
+        nameInput.addEventListener('blur', validateName);
+        nameInput.addEventListener('input', function() {
+            if (this.classList.contains('error')) validateName();
+        });
+    }
+    
+    if (emailInput) {
+        emailInput.addEventListener('blur', validateEmail);
+        emailInput.addEventListener('input', function() {
+            if (this.classList.contains('error')) validateEmail();
+        });
+    }
+    
+    if (subjectInput) {
+        subjectInput.addEventListener('change', validateSubject);
+    }
+    
+    if (messageInput) {
+        messageInput.addEventListener('blur', validateMessage);
+        messageInput.addEventListener('input', function() {
+            if (this.classList.contains('error')) validateMessage();
+        });
+    }
+    
+    if (consentInput) {
+        consentInput.addEventListener('change', validateConsent);
+    }
+    
+    // ============================================
+    // SOUMISSION DU FORMULAIRE
+    // ============================================
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validation complète
+            const isNameValid = validateName();
+            const isEmailValid = validateEmail();
+            const isSubjectValid = validateSubject();
+            const isMessageValid = validateMessage();
+            const isConsentValid = validateConsent();
+            
+            if (!isNameValid || !isEmailValid || !isSubjectValid || !isMessageValid || !isConsentValid) {
+                showNotification('Veuillez corriger les erreurs dans le formulaire', 'error');
+                return;
+            }
+            
+            // Animation du bouton
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            submitBtn.disabled = true;
+            
+            // Soumettre le formulaire
+            this.submit();
+        });
+    }
+    
+    // ============================================
+    // ACCORDION FAQ
+    // ============================================
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+        const toggle = item.querySelector('[data-faq-toggle]');
+        
+        toggle.addEventListener('click', function() {
+            const isActive = item.classList.contains('active');
+            
+            // Fermer tous les autres items
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('active');
+                }
+            });
+            
+            // Toggle l'item actuel
+            if (isActive) {
+                item.classList.remove('active');
+            } else {
+                item.classList.add('active');
+            }
+        });
+    });
+    
+    // Ouvrir le premier item par défaut
+    if (faqItems.length > 0) {
+        faqItems[0].classList.add('active');
+    }
+    
+    // ============================================
+    // SMOOTH SCROLL POUR LES LIENS D'ANCRAGE
+    // ============================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#' && href.length > 1) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    const offset = 100;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    });
+    
+    // ============================================
+    // AUTO-DISMISS DES ALERTES
+    // ============================================
+    const alerts = document.querySelectorAll('.alert-modern');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.animation = 'slideOutUp 0.3s ease';
+            setTimeout(() => alert.remove(), 300);
+        }, 8000);
+    });
+    
+    // ============================================
+    // SYSTÈME DE NOTIFICATIONS
+    // ============================================
+    window.showNotification = function(message, type = 'info') {
+        const notification = document.createElement('div');
+        
+        const icons = {
+            success: 'check-circle',
+            error: 'times-circle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+        
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-${icons[type] || icons.info}" style="font-size: 1.25rem;"></i>
+            <span style="flex: 1;">${message}</span>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer; padding: 0; margin-left: 10px;">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    };
+    
+    // ============================================
+    // ANIMATION DES INPUTS
+    // ============================================
+    const inputs = document.querySelectorAll('.form-input-modern');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.transform = 'scale(1.01)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // ============================================
+    // COPIER EMAIL AU CLIC
+    // ============================================
+    const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
+    emailLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = this.textContent.trim();
+            navigator.clipboard.writeText(email).then(() => {
+                showNotification('Email copié dans le presse-papier !', 'success');
+            });
+        });
+    });
+    
+    // ============================================
+    // ANIMATION AU SCROLL
+    // ============================================
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observer les cartes de contact
+    document.querySelectorAll('.contact-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+    
+    // ============================================
+    // RACCOURCIS CLAVIER
+    // ============================================
+    document.addEventListener('keydown', function(e) {
+        // Escape pour fermer les notifications
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.alert-modern').forEach(alert => alert.remove());
+        }
+    });
+    
+    // ============================================
+    // DÉTECTION D'INACTIVITÉ
+    // ============================================
+    let inactivityTimer;
+    
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            if (nameInput && nameInput.value.trim() && !contactForm.submitted) {
+                showNotification('N\'oubliez pas d\'envoyer votre message !', 'info');
+            }
+        }, 120000); // 2 minutes
+    }
+    
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, true);
+    });
+    
+    resetInactivityTimer();
+    
+});
+
+// Animations CSS additionnelles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes slideOutUp {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(-30px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- AOS Animation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true,
+        offset: 100
+    });
+</script>
+{% endblock %}

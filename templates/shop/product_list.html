@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tous nos produits{% endblock %}
+
+{% block meta_description %}
+Découvrez notre large catalogue de produits de qualité. Filtrez par catégorie, prix et profitez de nos meilleures offres.
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product-list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     BREADCRUMB MODERNE
+     ======================================== -->
+<section class="breadcrumb-modern">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb-custom">
+                <li class="breadcrumb-item-custom">
+                    <a href="{% url 'core:home' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item-custom">
+                    <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                </li>
+                <li class="breadcrumb-item-custom active">
+                    <span>Boutique</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<!-- ========================================
+     HEADER SECTION MODERNE
+     ======================================== -->
+<section class="shop-header-section">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="header-content">
+                    <h1 class="shop-title">
+                        <span class="title-icon">
+                            <i class="fas fa-store"></i>
+                        </span>
+                        Notre Boutique
+                    </h1>
+                    <p class="shop-subtitle">
+                        Découvrez notre sélection de <strong>{{ page_obj.paginator.count }}</strong> produits de qualité
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="header-controls">
+                    <div class="view-toggle-group">
+                        <span class="view-label">Affichage :</span>
+                        <div class="view-buttons">
+                            <button type="button" class="view-toggle-btn active" data-view="grid" aria-label="Vue grille">
+                                <i class="fas fa-th"></i>
+                                <span>Grille</span>
+                            </button>
+                            <button type="button" class="view-toggle-btn" data-view="list" aria-label="Vue liste">
+                                <i class="fas fa-list"></i>
+                                <span>Liste</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtres actifs -->
+        <div id="active-filters" class="active-filters-container"></div>
+    </div>
+</section>
+
+<!-- ========================================
+     CATALOGUE PRINCIPAL
+     ======================================== -->
+<section class="catalog-section">
+    <div class="container">
+        <div class="row">
+            
+            <!-- ========================================
+                 SIDEBAR FILTRES MODERNE
+                 ======================================== -->
+            <div class="col-lg-3 mb-4">
+                <aside class="filter-sidebar-modern">
+                    
+                    <!-- Recherche rapide -->
+                    <div class="filter-card">
+                        <div class="filter-card-header">
+                            <div class="filter-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h6 class="filter-title">Recherche rapide</h6>
+                        </div>
+                        <div class="filter-card-body">
+                            <form method="get" action="{% url 'shop:product_search' %}" class="search-form">
+                                <div class="search-input-wrapper">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" 
+                                           class="search-input" 
+                                           name="q" 
+                                           placeholder="Rechercher un produit..."
+                                           aria-label="Rechercher un produit">
+                                    <button class="search-submit-btn" type="submit" aria-label="Rechercher">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Catégories -->
+                    <div class="filter-card">
+                        <div class="filter-card-header">
+                            <div class="filter-icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <h6 class="filter-title">Catégories</h6>
+                        </div>
+                        <div class="filter-card-body">
+                            <div class="category-list">
+                                <a href="{% url 'shop:product_list' %}" class="category-item category-item-all">
+                                    <span class="category-name">
+                                        <i class="fas fa-th-large"></i>
+                                        Toutes les catégories
+                                    </span>
+                                    <span class="category-badge">{{ page_obj.paginator.count }}</span>
+                                </a>
+                                {% for category in categories %}
+                                <a href="{% url 'shop:category_detail' category.slug %}" class="category-item">
+                                    <span class="category-name">
+                                        <i class="fas fa-tag"></i>
+                                        {{ category.name }}
+                                    </span>
+                                    <span class="category-badge">{{ category.products.count }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtre Prix -->
+                    <div class="filter-card">
+                        <div class="filter-card-header">
+                            <div class="filter-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <h6 class="filter-title">Fourchette de prix</h6>
+                        </div>
+                        <div class="filter-card-body">
+                            <div class="price-range-container">
+                                <div class="price-display">
+                                    <span class="price-value" id="price-value">0 - 1000000</span>
+                                    <span class="price-currency">FCFA</span>
+                                </div>
+                                <input type="range" 
+                                       class="price-range-slider" 
+                                       id="price-range" 
+                                       min="0" 
+                                       max="1000000" 
+                                       step="5000" 
+                                       value="1000000"
+                                       aria-label="Sélectionner le prix maximum">
+                                <div class="price-inputs">
+                                    <div class="price-input-group">
+                                        <label class="price-label" for="min-price">Min</label>
+                                        <input type="number" 
+                                               class="price-input" 
+                                               id="min-price" 
+                                               value="0"
+                                               aria-label="Prix minimum">
+                                    </div>
+                                    <div class="price-separator">-</div>
+                                    <div class="price-input-group">
+                                        <label class="price-label" for="max-price">Max</label>
+                                        <input type="number" 
+                                               class="price-input" 
+                                               id="max-price" 
+                                               value="1000000"
+                                               aria-label="Prix maximum">
+                                    </div>
+                                </div>
+                                <button class="filter-apply-btn" id="apply-price-filter">
+                                    <i class="fas fa-check"></i>
+                                    <span>Appliquer</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtre Disponibilité -->
+                    <div class="filter-card">
+                        <div class="filter-card-header">
+                            <div class="filter-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <h6 class="filter-title">Disponibilité</h6>
+                        </div>
+                        <div class="filter-card-body">
+                            <div class="filter-checkbox-group">
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" id="in-stock" checked>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-label">
+                                        <i class="fas fa-check-circle"></i>
+                                        En stock
+                                        <span class="checkbox-count">({{ page_obj.paginator.count }})</span>
+                                    </span>
+                                </label>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" id="on-sale">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-label">
+                                        <i class="fas fa-percent"></i>
+                                        En promotion
+                                    </span>
+                                </label>
+                                <label class="filter-checkbox">
+                                    <input type="checkbox" id="new-arrivals">
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-label">
+                                        <i class="fas fa-sparkles"></i>
+                                        Nouveautés
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtre Note -->
+                    <div class="filter-card">
+                        <div class="filter-card-header">
+                            <div class="filter-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h6 class="filter-title">Note client</h6>
+                        </div>
+                        <div class="filter-card-body">
+                            <div class="filter-radio-group">
+                                <label class="filter-radio">
+                                    <input type="radio" name="rating" id="rating-5">
+                                    <span class="radio-custom"></span>
+                                    <span class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                    <span class="rating-label">et plus</span>
+                                </label>
+                                <label class="filter-radio">
+                                    <input type="radio" name="rating" id="rating-4">
+                                    <span class="radio-custom"></span>
+                                    <span class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </span>
+                                    <span class="rating-label">et plus</span>
+                                </label>
+                                <label class="filter-radio">
+                                    <input type="radio" name="rating" id="rating-3">
+                                    <span class="radio-custom"></span>
+                                    <span class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </span>
+                                    <span class="rating-label">et plus</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Réinitialiser les filtres -->
+                    <button class="reset-filters-btn" id="reset-filters">
+                        <i class="fas fa-redo"></i>
+                        <span>Réinitialiser les filtres</span>
+                    </button>
+                    
+                </aside>
+            </div>
+            
+            <!-- ========================================
+                 LISTE DES PRODUITS MODERNE
+                 ======================================== -->
+            <div class="col-lg-9">
+                
+                <!-- Barre de tri moderne -->
+                <div class="sort-bar">
+                    <div class="sort-bar-content">
+                        <div class="products-count">
+                            <i class="fas fa-box-open"></i>
+                            <span><strong id="product-count">{{ page_obj.paginator.count }}</strong> produit{{ page_obj.paginator.count|pluralize }} trouvé{{ page_obj.paginator.count|pluralize }}</span>
+                        </div>
+                        <div class="sort-controls">
+                            <label for="sort-by" class="sort-label">
+                                <i class="fas fa-sort-amount-down"></i>
+                                Trier par :
+                            </label>
+                            <select class="sort-select" id="sort-by">
+                                <option value="newest">Plus récents</option>
+                                <option value="popular">Plus populaires</option>
+                                <option value="price-asc">Prix croissant</option>
+                                <option value="price-desc">Prix décroissant</option>
+                                <option value="name-asc">Nom A-Z</option>
+                                <option value="name-desc">Nom Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grille de produits moderne -->
+                <div class="products-grid" id="products-container">
+                    {% if page_obj %}
+                        {% for product in page_obj %}
+                        <article class="product-item-wrapper" 
+                             data-price="{{ product.current_price }}" 
+                             data-category="{{ product.category.slug }}"
+                             data-name="{{ product.name|lower }}">
+                            <div class="product-card-modern">
+                                
+                                <!-- Image avec overlay -->
+                                <div class="product-image-container">
+                                    {% if product.has_discount %}
+                                    <span class="product-badge-modern badge-sale">
+                                        <i class="fas fa-tag"></i>
+                                        -{{ product.discount_percentage }}%
+                                    </span>
+                                    {% elif product.is_new %}
+                                    <span class="product-badge-modern badge-new">
+                                        <i class="fas fa-sparkles"></i>
+                                        Nouveau
+                                    </span>
+                                    {% endif %}
+                                    
+                                    <a href="{% url 'shop:product_detail' product.slug %}" class="product-link">
+                                        <div class="product-image-wrapper">
+                                            <img src="{{ product.main_image.url }}" 
+                                                 alt="{{ product.name }}" 
+                                                 class="product-image"
+                                                 loading="lazy">
+                                        </div>
+                                        
+                                        <!-- Overlay moderne -->
+                                        <div class="product-overlay-modern">
+                                            <div class="overlay-actions">
+                                                <button class="overlay-action-btn" 
+                                                        title="Aperçu rapide"
+                                                        aria-label="Aperçu rapide de {{ product.name }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#quickViewModal{{ product.id }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="overlay-action-btn add-to-cart-btn" 
+                                                        title="Ajouter au panier"
+                                                        aria-label="Ajouter {{ product.name }} au panier"
+                                                        data-variant-id="{% if product.variants.first %}{{ product.variants.first.id }}{% endif %}"
+                                                        {% if not product.variants.first or not product.variants.first.stock.is_in_stock %}disabled{% endif %}>
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </button>
+                                                <button class="overlay-action-btn" 
+                                                        title="Ajouter aux favoris"
+                                                        aria-label="Ajouter {{ product.name }} aux favoris">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                
+                                <!-- Contenu de la carte -->
+                                <div class="product-content-modern">
+                                    <div class="product-category-modern">
+                                        <a href="{% url 'shop:category_detail' product.category.slug %}">
+                                            <i class="fas fa-tag"></i>
+                                            {{ product.category.name }}
+                                        </a>
+                                    </div>
+                                    
+                                    <h3 class="product-title-modern">
+                                        <a href="{% url 'shop:product_detail' product.slug %}">
+                                            {{ product.name }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <div class="product-rating-modern">
+                                        <div class="stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="rating-count">({{ product.views_count }})</span>
+                                    </div>
+                                    
+                                    {% if product.short_description %}
+                                    <p class="product-description-modern">
+                                        {{ product.short_description|truncatewords:12 }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <div class="product-footer-modern">
+                                        <div class="product-price-modern">
+                                            {% if product.has_discount %}
+                                            <div class="price-wrapper">
+                                                <span class="price-current">{{ product.current_price|floatformat:0 }}</span>
+                                                <span class="price-currency">FCFA</span>
+                                            </div>
+                                            <span class="price-old">{{ product.base_price|floatformat:0 }} FCFA</span>
+                                            {% else %}
+                                            <div class="price-wrapper">
+                                                <span class="price-current">{{ product.current_price|floatformat:0 }}</span>
+                                                <span class="price-currency">FCFA</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="product-stock-modern">
+                                            {% if product.variants.first.stock.is_in_stock %}
+                                            <span class="stock-badge stock-in">
+                                                <i class="fas fa-check-circle"></i>
+                                                En stock
+                                            </span>
+                                            {% else %}
+                                            <span class="stock-badge stock-out">
+                                                <i class="fas fa-times-circle"></i>
+                                                Rupture
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="product-actions-modern">
+                                        <a href="{% url 'shop:product_detail' product.slug %}" 
+                                           class="btn-product-view">
+                                            <i class="fas fa-eye"></i>
+                                            <span>Voir le produit</span>
+                                        </a>
+                                        <button class="btn-product-cart add-to-cart-btn" 
+                                                data-variant-id="{% if product.variants.first %}{{ product.variants.first.id }}{% endif %}"
+                                                aria-label="Ajouter au panier"
+                                                {% if not product.variants.first or not product.variants.first.stock.is_in_stock %}disabled{% endif %}>
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Aucun produit trouvé -->
+                        <div class="no-products-container">
+                            <div class="no-products-card">
+                                <div class="no-products-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <h3 class="no-products-title">Aucun produit trouvé</h3>
+                                <p class="no-products-text">
+                                    Désolé, nous n'avons trouvé aucun produit correspondant à vos critères de recherche.
+                                </p>
+                                <a href="{% url 'shop:product_list' %}" class="btn-reset-search">
+                                    <i class="fas fa-redo"></i>
+                                    Réinitialiser les filtres
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pagination moderne -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Navigation des produits" class="pagination-container">
+                    <ul class="pagination-modern">
+                        {% if page_obj.has_previous %}
+                        <li class="pagination-item">
+                            <a class="pagination-link" href="?page=1" aria-label="Première page">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="pagination-item">
+                            <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Page précédente">
+                                <i class="fas fa-angle-left"></i>
+                                <span class="d-none d-sm-inline">Précédent</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="pagination-item active">
+                                <span class="pagination-link" aria-current="page">{{ num }}</span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="pagination-item">
+                                <a class="pagination-link" href="?page={{ num }}" aria-label="Aller à la page {{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="pagination-item">
+                            <a class="pagination-link" href="?page={{ page_obj.next_page_number }}" aria-label="Page suivante">
+                                <span class="d-none d-sm-inline">Suivant</span>
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="pagination-item">
+                            <a class="pagination-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Dernière page">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     BANNIÈRE PROMOTIONNELLE MODERNE
+     ======================================== -->
+<section class="promo-banner-section">
+    <div class="container">
+        <div class="promo-banner-modern">
+            <div class="promo-background">
+                <div class="promo-shape promo-shape-1"></div>
+                <div class="promo-shape promo-shape-2"></div>
+                <div class="promo-shape promo-shape-3"></div>
+            </div>
+            <div class="promo-content">
+                <div class="promo-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h2 class="promo-title">Offre spéciale !</h2>
+                <p class="promo-text">
+                    Profitez de <strong class="promo-highlight">-20%</strong> sur votre première commande
+                </p>
+                <div class="promo-code">
+                    <span class="code-label">Code :</span>
+                    <span class="code-value">BIENVENUE20</span>
+                    <button class="code-copy-btn" data-code="BIENVENUE20" title="Copier le code" aria-label="Copier le code promotionnel">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <a href="{% url 'accounts:register' %}" class="btn-promo-cta">
+                    <i class="fas fa-user-plus"></i>
+                    <span>S'inscrire maintenant</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/shop/product-list.js' %}"></script>
+{% endblock %}

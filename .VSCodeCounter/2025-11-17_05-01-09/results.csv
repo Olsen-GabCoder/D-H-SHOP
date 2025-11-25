@@ -1,0 +1,10 @@
+"filename", "language", "Python", "comment", "blank", "total"
+"c:\mon_ecommerce\dashboard\__init__.py", "Python", 0, 0, 1, 1
+"c:\mon_ecommerce\dashboard\admin.py", "Python", 222, 97, 77, 396
+"c:\mon_ecommerce\dashboard\apps.py", "Python", 4, 0, 3, 7
+"c:\mon_ecommerce\dashboard\migrations\0001_initial.py", "Python", 88, 1, 7, 96
+"c:\mon_ecommerce\dashboard\migrations\__init__.py", "Python", 0, 0, 1, 1
+"c:\mon_ecommerce\dashboard\models.py", "Python", 234, 80, 49, 363
+"c:\mon_ecommerce\dashboard\tests.py", "Python", 1, 1, 2, 4
+"c:\mon_ecommerce\dashboard\views.py", "Python", 251, 97, 71, 419
+"Total", "-", 800, 276, 211, 1287

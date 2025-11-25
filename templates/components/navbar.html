@@ -1,0 +1,1445 @@
+{% load static %}
+{% load site_settings %}
+
+<!-- ========================================
+     NAVBAR MODERNE ET PROFESSIONNELLE
+     ======================================== -->
+<nav class="navbar-modern navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand brand-modern" href="{% url 'core:home' %}">
+            {% if site.logo_url %}
+            <img src="{{ site.logo_url }}" alt="{{ site.site_name }}" class="brand-logo-img" style="height: 48px; width: auto; border-radius: 12px;">
+            {% else %}
+            <div class="brand-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            {% endif %}
+            <span class="brand-text">
+                <span class="brand-name">{{ site.site_name|default:'D&H-SHOP' }}</span>
+                <span class="brand-subtitle">{{ site.site_tagline|default:'Gabon' }}</span>
+            </span>
+        </a>
+        
+        <!-- Toggle pour mobile -->
+        <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="toggler-icon"></span>
+            <span class="toggler-icon"></span>
+            <span class="toggler-icon"></span>
+        </button>
+        
+        <!-- Menu de navigation -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav nav-modern me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'shop:product_list' %}">
+                        <i class="fas fa-store"></i>
+                        <span>Boutique</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:about' %}">
+                        <i class="fas fa-info-circle"></i>
+                        <span>À propos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:contact' %}">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:faq' %}">
+                        <i class="fas fa-question-circle"></i>
+                        <span>FAQ</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Recherche -->
+            <form class="search-form-modern d-flex me-3" method="get" action="{% url 'shop:product_search' %}">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input class="form-control search-input" type="search" name="q" placeholder="Rechercher un produit..." value="{{ query }}" aria-label="Rechercher">
+                    <button class="btn search-btn" type="submit" aria-label="Lancer la recherche">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Menu utilisateur -->
+            <ul class="navbar-nav nav-actions">
+                <!-- Panier -->
+                <li class="nav-item">
+                    <a class="nav-link cart-link" href="{% url 'orders:cart_detail' %}" aria-label="Panier">
+                        <div class="cart-icon-wrapper">
+                            <i class="fas fa-shopping-cart"></i>
+                            {% if request.session.cart %}
+                            <span class="cart-badge">
+                                {{ request.session.cart|length }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <span class="cart-text d-none d-xl-inline">Panier</span>
+                    </a>
+                </li>
+                
+                <!-- Compte -->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown account-dropdown">
+                    <a class="nav-link account-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="account-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="account-name d-none d-xl-inline">{{ user.first_name|default:user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end" aria-labelledby="accountDropdown">
+                        <li class="dropdown-header">
+                            <div class="user-info">
+                                <div class="user-avatar-large">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-details">
+                                    <strong>{{ user.first_name|default:user.username }}</strong>
+                                    <small class="text-muted">{{ user.email }}</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Tableau de bord</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user-edit"></i>
+                                <span>Mon profil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'accounts:order_list' %}">
+                                <i class="fas fa-box"></i>
+                                <span>Mes commandes</span>
+                            </a>
+                        </li>
+
+
+{% if user.is_staff or user.is_superuser %}
+<li>
+    <a class="dropdown-item" href="/admin/core/sitesettings/">
+        <i class="fas fa-cog"></i>
+        <span>Paramètres du site</span>
+    </a>
+</li>
+<li><hr class="dropdown-divider"></li>
+{% endif %}
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Déconnexion</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link login-link" href="{% url 'accounts:login' %}">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Connexion</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-register" href="{% url 'accounts:register' %}">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Inscription</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ========================================
+     STYLES CSS DE LA NAVBAR MODERNE
+     ======================================== -->
+<style>
+/* ===================================
+   VARIABLES CSS
+   =================================== */
+:root {
+    --navbar-primary: #e74c3c;
+    --navbar-primary-hover: #ff6b6b;
+    --navbar-bg-dark: #1a1a2e;
+    --navbar-bg-darker: #16213e;
+    --navbar-text-light: #ffffff;
+    --navbar-text-muted: #adb5bd;
+    --navbar-border: rgba(255, 255, 255, 0.1);
+    --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --navbar-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================================
+   NAVBAR MODERNE - BASE
+   =================================== */
+.navbar-modern {
+    background: linear-gradient(135deg, var(--navbar-bg-dark) 0%, var(--navbar-bg-darker) 100%);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--navbar-shadow);
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--navbar-border);
+    position: relative;
+    z-index: 1030;
+}
+
+.navbar-modern::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--navbar-primary) 50%, 
+        transparent 100%
+    );
+    opacity: 0.6;
+}
+
+.navbar-modern::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(231, 76, 60, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ===================================
+   LOGO / BRAND MODERNE
+   =================================== */
+.brand-modern {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    transition: var(--navbar-transition);
+}
+
+.brand-modern:hover {
+    transform: translateY(-2px);
+}
+
+.brand-logo-img {
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    transition: var(--navbar-transition);
+}
+
+.brand-modern:hover .brand-logo-img {
+    transform: rotate(5deg) scale(1.05);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+}
+
+.brand-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--navbar-primary), var(--navbar-primary-hover));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    transition: var(--navbar-transition);
+}
+
+.brand-modern:hover .brand-icon {
+    transform: rotate(5deg) scale(1.05);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+}
+
+.brand-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brand-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--navbar-text-light);
+    letter-spacing: -0.5px;
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    color: var(--navbar-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ===================================
+   NAVIGATION MODERNE
+   =================================== */
+.nav-modern .nav-item {
+    position: relative;
+}
+
+.nav-modern .nav-link {
+    color: var(--navbar-text-muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: var(--navbar-transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-modern .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+}
+
+.nav-modern .nav-link:hover::before,
+.nav-modern .nav-link.active::before {
+    transform: scaleX(1);
+}
+
+.nav-modern .nav-link i {
+    font-size: 1rem;
+    transition: var(--navbar-transition);
+}
+
+.nav-modern .nav-link:hover,
+.nav-modern .nav-link.active {
+    color: var(--navbar-text-light);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-modern .nav-link:hover i {
+    color: var(--navbar-primary);
+    transform: scale(1.1);
+}
+
+.nav-modern .nav-link.active i {
+    color: var(--navbar-primary);
+}
+
+/* Indicateur actif */
+.nav-modern .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 2px;
+    background: var(--navbar-primary);
+    border-radius: 2px;
+}
+
+/* ===================================
+   RECHERCHE MODERNE
+   =================================== */
+.search-form-modern {
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--navbar-border);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    transition: var(--navbar-transition);
+    backdrop-filter: blur(10px);
+}
+
+.search-wrapper:focus-within {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--navbar-primary);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.search-icon {
+    color: var(--navbar-text-muted);
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    transition: var(--navbar-transition);
+}
+
+.search-wrapper:focus-within .search-icon {
+    color: var(--navbar-primary);
+}
+
+.search-input {
+    background: transparent;
+    border: none;
+    color: var(--navbar-text-light);
+    font-size: 0.9rem;
+    padding: 0;
+    width: 200px;
+    transition: width 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: none;
+    width: 250px;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-btn {
+    background: var(--navbar-primary);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 0.5rem;
+    transition: var(--navbar-transition);
+}
+
+.search-btn:hover {
+    background: var(--navbar-primary-hover);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.search-btn i {
+    font-size: 0.875rem;
+}
+
+/* ===================================
+   ACTIONS (PANIER & COMPTE)
+   =================================== */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Lien panier */
+.cart-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--navbar-text-muted);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    transition: var(--navbar-transition);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.cart-link:hover {
+    color: var(--navbar-text-light);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.cart-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-icon-wrapper i {
+    font-size: 1.25rem;
+    transition: var(--navbar-transition);
+}
+
+.cart-link:hover .cart-icon-wrapper i {
+    color: var(--navbar-primary);
+    transform: scale(1.1);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--navbar-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.5);
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Lien compte */
+.account-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--navbar-text-muted);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    transition: var(--navbar-transition);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.account-link:hover {
+    color: var(--navbar-text-light);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.account-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--navbar-primary), var(--navbar-primary-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+    transition: var(--navbar-transition);
+}
+
+.account-link:hover .account-avatar {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.6);
+}
+
+.account-avatar i {
+    color: white;
+    font-size: 1rem;
+}
+
+.account-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Lien connexion */
+.login-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--navbar-text-muted);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    transition: var(--navbar-transition);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.login-link:hover {
+    color: var(--navbar-text-light);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.login-link i {
+    font-size: 1.1rem;
+}
+
+/* Bouton inscription */
+.btn-register {
+    background: linear-gradient(135deg, var(--navbar-primary), var(--navbar-primary-hover));
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--navbar-transition);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+    background: linear-gradient(135deg, var(--navbar-primary-hover), var(--navbar-primary));
+}
+
+.btn-register i {
+    font-size: 1rem;
+}
+
+/* ===================================
+   DROPDOWN MODERNE
+   =================================== */
+.dropdown-menu-modern {
+    background: linear-gradient(135deg, var(--navbar-bg-dark), var(--navbar-bg-darker));
+    border: 1px solid var(--navbar-border);
+    border-radius: 12px;
+    padding: 0.75rem;
+    min-width: 280px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    margin-top: 0.5rem;
+}
+
+.dropdown-header {
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.user-avatar-large {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--navbar-primary), var(--navbar-primary-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-avatar-large i {
+    color: white;
+    font-size: 1.25rem;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.user-details strong {
+    color: var(--navbar-text-light);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-details small {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-menu-modern .dropdown-item {
+    color: var(--navbar-text-muted);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: var(--navbar-transition);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.dropdown-menu-modern .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--navbar-text-light);
+    transform: translateX(5px);
+}
+
+.dropdown-menu-modern .dropdown-item i {
+    width: 20px;
+    font-size: 1rem;
+    transition: var(--navbar-transition);
+}
+
+.dropdown-menu-modern .dropdown-item:hover i {
+    color: var(--navbar-primary);
+}
+
+.logout-btn {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    color: var(--navbar-primary);
+}
+
+.logout-btn:hover {
+    color: var(--navbar-primary-hover);
+}
+
+.dropdown-divider {
+    border-color: var(--navbar-border);
+    margin: 0.5rem 0;
+}
+
+/* ===================================
+   TOGGLER MOBILE MODERNE
+   =================================== */
+.modern-toggler {
+    border: none;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    transition: var(--navbar-transition);
+}
+
+.modern-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+    outline: none;
+}
+
+.toggler-icon {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--navbar-text-light);
+    margin: 5px 0;
+    transition: var(--navbar-transition);
+    border-radius: 2px;
+}
+
+.modern-toggler[aria-expanded="true"] .toggler-icon:nth-child(1) {
+    transform: rotate(45deg) translateY(9px);
+}
+
+.modern-toggler[aria-expanded="true"] .toggler-icon:nth-child(2) {
+    opacity: 0;
+}
+
+.modern-toggler[aria-expanded="true"] .toggler-icon:nth-child(3) {
+    transform: rotate(-45deg) translateY(-9px);
+}
+
+/* ===================================
+   STICKY EFFECT
+   =================================== */
+.navbar-modern.scrolled {
+    padding: 0.5rem 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+@media (max-width: 1399.98px) {
+    .cart-text,
+    .account-name {
+        display: none !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-modern {
+        padding: 1rem 0;
+    }
+    
+    .navbar-collapse {
+        background: rgba(22, 33, 62, 0.98);
+        border-radius: 12px;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--navbar-border);
+    }
+    
+    .nav-modern {
+        margin-bottom: 1rem;
+    }
+    
+    .nav-modern .nav-link {
+        margin-bottom: 0.25rem;
+    }
+    
+    .search-form-modern {
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+    
+    .search-wrapper {
+        width: 100%;
+    }
+    
+    .search-input {
+        width: 100% !important;
+    }
+    
+    .nav-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+    
+    .cart-link,
+    .login-link,
+    .account-link {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .btn-register {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dropdown-menu-modern {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .brand-modern {
+        gap: 0.5rem;
+    }
+    
+    .brand-icon,
+    .brand-logo-img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .brand-icon i {
+        font-size: 1.25rem;
+    }
+    
+    .brand-name {
+        font-size: 1.1rem;
+    }
+    
+    .brand-subtitle {
+        font-size: 0.7rem;
+    }
+}
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu-modern {
+    animation: slideDown 0.3s ease;
+}
+
+/* ===================================
+   ACCESSIBILITÉ
+   =================================== */
+.nav-link:focus-visible,
+.cart-link:focus-visible,
+.account-link:focus-visible,
+.login-link:focus-visible,
+.btn-register:focus-visible,
+.search-input:focus-visible,
+.search-btn:focus-visible {
+    outline: 2px solid var(--navbar-primary);
+    outline-offset: 3px;
+}
+
+/* Mode réduit pour animations */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===================================
+   MODE SOMBRE AMÉLIORÉ
+   =================================== */
+@media (prefers-color-scheme: dark) {
+    .navbar-modern {
+        background: linear-gradient(135deg, #0f0f1e 0%, #0d1117 100%);
+    }
+}
+</style>
+
+<!-- ========================================
+     SCRIPT JAVASCRIPT DE LA NAVBAR
+     ======================================== -->
+<script>
+(function() {
+    'use strict';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // ===================================
+        // EFFET SCROLL SUR LA NAVBAR
+        // ===================================
+        const navbar = document.querySelector('.navbar-modern');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // ===================================
+        // ACTIVE STATE POUR LES LIENS
+        // ===================================
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-modern .nav-link');
+        
+        navLinks.forEach(function(link) {
+            const href = link.getAttribute('href');
+            if (href && currentPath.includes(href) && href !== '/') {
+                link.classList.add('active');
+            } else if (href === '/' && currentPath === '/') {
+                link.classList.add('active');
+            }
+        });
+        
+        // ===================================
+        // RECHERCHE AUTO-FOCUS
+        // ===================================
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            // Raccourci clavier pour la recherche (Ctrl/Cmd + K)
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+            
+            // Animation de focus
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        }
+        
+        // ===================================
+        // ANIMATION DU BADGE PANIER
+        // ===================================
+        const cartBadge = document.querySelector('.cart-badge');
+        if (cartBadge) {
+            // Animation lors de l'ajout au panier (à déclencher depuis votre code d'ajout)
+            window.animateCartBadge = function() {
+                cartBadge.style.animation = 'none';
+                setTimeout(function() {
+                    cartBadge.style.animation = '';
+                }, 10);
+            };
+        }
+        
+        // ===================================
+        // DROPDOWN ANIMATION AMÉLIORÉE
+        // ===================================
+        const dropdownMenus = document.querySelectorAll('.dropdown-menu-modern');
+        dropdownMenus.forEach(function(menu) {
+            const dropdown = menu.previousElementSibling;
+            
+            dropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isShown = menu.classList.contains('show');
+                
+                if (!isShown) {
+                    menu.style.display = 'block';
+                    setTimeout(function() {
+                        menu.classList.add('show');
+                    }, 10);
+                }
+            });
+        });
+        
+        // ===================================
+        // GESTION DU COLLAPSE POUR LE TOGGLER
+        // ===================================
+        const navbarToggler = document.querySelector('.modern-toggler');
+        const navbarCollapse = document.querySelector('#navbarNav');
+        if (navbarToggler && navbarCollapse) {
+            navbarCollapse.addEventListener('show.bs.collapse', function() {
+                navbarToggler.setAttribute('aria-expanded', 'true');
+            });
+            
+            navbarCollapse.addEventListener('hide.bs.collapse', function() {
+                navbarToggler.setAttribute('aria-expanded', 'false');
+            });
+        }
+        
+        // ===================================
+        // EFFET DE SURVOL SUR LES ITEMS
+        // ===================================
+        const navItems = document.querySelectorAll('.nav-modern .nav-item');
+        navItems.forEach(function(item) {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // ===================================
+        // PRÉCHARGEMENT DES DROPDOWNS
+        // ===================================
+        const dropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+        dropdownToggles.forEach(function(toggle) {
+            toggle.addEventListener('mouseenter', function() {
+                const dropdown = bootstrap.Dropdown.getInstance(this) || new bootstrap.Dropdown(this);
+                setTimeout(function() {
+                    dropdown.show();
+                }, 100);
+            });
+        });
+        
+        // ===================================
+        // GESTION DE LA RECHERCHE
+        // ===================================
+        const searchForm = document.querySelector('.search-form-modern');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(e) {
+                const query = searchInput.value.trim();
+                if (!query) {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.style.borderColor = 'var(--navbar-primary)';
+                    setTimeout(function() {
+                        searchInput.style.borderColor = '';
+                    }, 1000);
+                }
+            });
+        }
+        
+        // ===================================
+        // INDICATEUR DE CONNEXION
+        // ===================================
+        const accountLink = document.querySelector('.account-link');
+        if (accountLink) {
+            // Animation de pulsation pour les nouvelles notifications (optionnel)
+            window.notifyUser = function() {
+                const avatar = accountLink.querySelector('.account-avatar');
+                if (avatar) {
+                    avatar.style.animation = 'pulse-badge 0.5s ease 3';
+                }
+            };
+        }
+        
+        // ===================================
+        // GESTION DES CLICS EXTERNES
+        // ===================================
+        document.addEventListener('click', function(e) {
+            const navbar = document.querySelector('.navbar-modern');
+            if (navbar && !navbar.contains(e.target)) {
+                // Fermer tous les dropdowns ouverts
+                const openDropdowns = document.querySelectorAll('.dropdown-menu.show');
+                openDropdowns.forEach(function(dropdown) {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+        
+        // ===================================
+        // AMÉLIORATION DE L'ACCESSIBILITÉ
+        // ===================================
+        
+        // Navigation au clavier dans le menu
+        const allLinks = document.querySelectorAll('.navbar-modern a, .navbar-modern button');
+        allLinks.forEach(function(link, index) {
+            link.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab' && !e.shiftKey && index === allLinks.length - 1) {
+                    // Dernier élément, revenir au premier
+                    e.preventDefault();
+                    allLinks[0].focus();
+                }
+            });
+        });
+        
+        // Annonce pour les lecteurs d'écran
+        const srAnnouncement = document.createElement('div');
+        srAnnouncement.className = 'sr-only';
+        srAnnouncement.setAttribute('role', 'status');
+        srAnnouncement.setAttribute('aria-live', 'polite');
+        document.body.appendChild(srAnnouncement);
+        
+        // ===================================
+        // GESTION DU PANIER EN TEMPS RÉEL
+        // ===================================
+        window.updateCartCount = function(count) {
+            let badge = document.querySelector('.cart-badge');
+            const cartIcon = document.querySelector('.cart-icon-wrapper');
+            
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'cart-badge';
+                    cartIcon.appendChild(badge);
+                }
+                badge.textContent = count;
+                badge.style.animation = 'pulse-badge 0.5s ease';
+            } else if (badge) {
+                badge.remove();
+            }
+        };
+        
+        // ===================================
+        // PERFORMANCE: DEBOUNCE DU SCROLL
+        // ===================================
+        let scrollTimeout;
+        const optimizedScrollHandler = function() {
+            if (scrollTimeout) {
+                window.cancelAnimationFrame(scrollTimeout);
+            }
+            
+            scrollTimeout = window.requestAnimationFrame(function() {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', optimizedScrollHandler, { passive: true });
+        
+        // ===================================
+        // DÉTECTION DU MODE SOMBRE DU SYSTÈME
+        // ===================================
+        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function handleDarkMode(e) {
+            if (e.matches) {
+                navbar.classList.add('dark-mode');
+            } else {
+                navbar.classList.remove('dark-mode');
+            }
+        }
+        
+        darkModeQuery.addEventListener('change', handleDarkMode);
+        handleDarkMode(darkModeQuery);
+        
+        // ===================================
+        // GESTION DES ERREURS
+        // ===================================
+        window.addEventListener('error', function(e) {
+            console.error('Navbar Error:', e.message);
+        });
+        
+        // ===================================
+        // SAUVEGARDE DE L'ÉTAT DE RECHERCHE
+        // ===================================
+        if (searchInput) {
+            // Restaurer la dernière recherche depuis sessionStorage
+            const lastSearch = sessionStorage.getItem('lastSearch');
+            if (lastSearch && !searchInput.value) {
+                searchInput.value = lastSearch;
+            }
+            
+            // Sauvegarder la recherche
+            searchForm.addEventListener('submit', function() {
+                sessionStorage.setItem('lastSearch', searchInput.value);
+            });
+        }
+        
+        // ===================================
+        // ANALYTICS (SI NÉCESSAIRE)
+        // ===================================
+        function trackNavigation(action, label) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    'event_category': 'Navigation',
+                    'event_label': label
+                });
+            }
+        }
+        
+        // Tracker les clics sur les liens de navigation
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                const linkText = this.textContent.trim();
+                trackNavigation('Click', linkText);
+            });
+        });
+        
+        // Tracker les recherches
+        if (searchForm) {
+            searchForm.addEventListener('submit', function() {
+                trackNavigation('Search', searchInput.value);
+            });
+        }
+        
+        // ===================================
+        // INITIALISATION TERMINÉE
+        // ===================================
+        console.log('Navbar moderne initialisée avec succès');
+        
+    });
+    
+    // ===================================
+    // FONCTIONS UTILITAIRES GLOBALES
+    // ===================================
+    
+    // Fonction pour mettre à jour le badge du panier (accessible globalement)
+    window.updateCart = function(itemCount) {
+        const badge = document.querySelector('.cart-badge');
+        const cartWrapper = document.querySelector('.cart-icon-wrapper');
+        
+        if (itemCount > 0) {
+            if (badge) {
+                badge.textContent = itemCount;
+            } else if (cartWrapper) {
+                const newBadge = document.createElement('span');
+                newBadge.className = 'cart-badge';
+                newBadge.textContent = itemCount;
+                cartWrapper.appendChild(newBadge);
+            }
+            
+            // Animation
+            if (badge) {
+                badge.style.animation = 'none';
+                setTimeout(() => {
+                    badge.style.animation = 'pulse-badge 0.5s ease';
+                }, 10);
+            }
+        } else if (badge) {
+            badge.style.transition = 'all 0.3s ease';
+            badge.style.transform = 'scale(0)';
+            badge.style.opacity = '0';
+            setTimeout(() => badge.remove(), 300);
+        }
+    };
+    
+    // Fonction pour afficher une notification dans la navbar
+    window.showNavbarNotification = function(message, type = 'info') {
+        const navbar = document.querySelector('.navbar-modern');
+        if (!navbar) return;
+        
+        const notification = document.createElement('div');
+        notification.className = `navbar-notification navbar-notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        notification.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: ${type === 'success' ? '#28a745' : '#17a2b8'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    };
+    
+})();
+</script>
+
+<!-- ========================================
+     ANIMATIONS SUPPLÉMENTAIRES
+     ======================================== -->
+<style>
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+/* Classe pour lecteurs d'écran */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Amélioration des transitions */
+.navbar-modern * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Support RTL */
+[dir="rtl"] .nav-modern .nav-link i {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+[dir="rtl"] .search-icon {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+[dir="rtl"] .dropdown-menu-modern {
+    text-align: right;
+}
+
+/* États de chargement */
+.navbar-modern.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.navbar-modern.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--navbar-primary);
+    animation: loading 1s ease infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar-modern {
+        display: none !important;
+    }
+}
+
+/* Correction pour Safari */
+@supports (-webkit-appearance: none) {
+    .search-input {
+        -webkit-appearance: none;
+    }
+}
+
+/* Amélioration du contraste pour l'accessibilité */
+@media (prefers-contrast: high) {
+    .navbar-modern {
+        border-bottom: 2px solid white;
+    }
+    
+    .nav-modern .nav-link,
+    .cart-link,
+    .account-link {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Support du mode économie d'énergie */
+@media (prefers-reduced-transparency) {
+    .navbar-modern,
+    .search-wrapper,
+    .dropdown-menu-modern {
+        backdrop-filter: none;
+        background: var(--navbar-bg-darker) !important;
+    }
+}
+</style>

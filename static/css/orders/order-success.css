@@ -1,0 +1,499 @@
+/* ========================================
+   ORDER-SUCCESS.CSS - Page de Confirmation
+   ======================================== */
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+.success-animation {
+    animation: successPulse 1.5s ease-in-out;
+}
+
+@keyframes successPulse {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.1); 
+    }
+}
+
+/* ===================================
+   CONFETTI ANIMATION
+   =================================== */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* ===================================
+   ORDER TIMELINE
+   =================================== */
+.order-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.order-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -31px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #27ae60;
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+    z-index: 2;
+}
+
+.timeline-item.pending::before {
+    border-color: #dee2e6;
+    background: #dee2e6;
+    box-shadow: none;
+}
+
+/* Animation pour les items actifs */
+.timeline-item:not(.pending)::before {
+    animation: timelinePulse 2s ease-in-out infinite;
+}
+
+@keyframes timelinePulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(39, 174, 96, 0.2);
+    }
+}
+
+/* ===================================
+   HOVER EFFECTS
+   =================================== */
+.hover-effect {
+    transition: all 0.3s ease;
+}
+
+.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+/* ===================================
+   SECTION STYLES
+   =================================== */
+.section {
+    padding: 60px 0;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+/* ===================================
+   CARDS
+   =================================== */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Info cards avec icônes */
+.info-card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+/* ===================================
+   TABLE STYLES
+   =================================== */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.75rem;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Image produit dans le tableau */
+.table .product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.table .product-image-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+}
+
+/* ===================================
+   BADGES
+   =================================== */
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* ===================================
+   ACCORDION (FAQ)
+   =================================== */
+.accordion-item {
+    border-radius: 12px !important;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.accordion-button {
+    font-weight: 600;
+    padding: 1.25rem 1.5rem;
+    background-color: white;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+.accordion-button::after {
+    margin-left: auto;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+    background-color: white;
+}
+
+/* ===================================
+   PRINT STYLES
+   =================================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+    }
+    
+    .section {
+        padding: 20px 0;
+    }
+    
+    .confetti-container {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+    }
+    
+    /* Forcer les couleurs en impression */
+    .bg-success,
+    .badge-success {
+        background-color: #28a745 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .table {
+        border: 1px solid #dee2e6;
+    }
+    
+    .table thead {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Pagination pour les longues pages */
+    .page-break {
+        page-break-after: always;
+    }
+}
+
+/* ===================================
+   BUTTONS
+   =================================== */
+.btn {
+    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-lg {
+    padding: 0.875rem 1.5rem;
+    font-size: 1.125rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ===================================
+   UTILITIES
+   =================================== */
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* ===================================
+   ANIMATIONS D'ENTRÉE
+   =================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 991.98px) {
+    .section {
+        padding: 40px 0;
+    }
+    
+    .order-timeline {
+        padding-left: 30px;
+    }
+    
+    .timeline-item::before {
+        left: -26px;
+        width: 16px;
+        height: 16px;
+    }
+    
+    .order-timeline::before {
+        left: 10px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .section {
+        padding: 30px 0;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+    
+    .success-animation .bg-white {
+        width: 100px !important;
+        height: 100px !important;
+    }
+    
+    .success-animation .fa-4x {
+        font-size: 3rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+    }
+    
+    /* Stack les boutons sur mobile */
+    .d-flex.gap-3 {
+        flex-direction: column;
+    }
+    
+    .d-flex.gap-3 > * {
+        width: 100%;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .table {
+        font-size: 0.875rem;
+    }
+    
+    .table .product-image,
+    .table .product-image-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Rendre le tableau scrollable horizontalement sur très petit écran */
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .info-card-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .info-card-icon i {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+.btn:focus,
+.accordion-button:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Améliorer le contraste */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Links accessibles */
+a:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* ===================================
+   TOAST CONTAINER
+   =================================== */
+.toast-container {
+    z-index: 10000;
+}
+
+.toast {
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* ===================================
+   CUSTOM SCROLLBAR (optional)
+   =================================== */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

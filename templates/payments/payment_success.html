@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement réussi{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-animation {
+        animation: successPulse 1.5s ease-in-out;
+    }
+    
+    @keyframes successPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        animation: confetti-fall 3s linear;
+    }
+    
+    @keyframes confetti-fall {
+        to {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="section text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                
+                <!-- Animation de succès -->
+                <div class="success-animation mb-5">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                         style="width: 150px; height: 150px;">
+                        <i class="fas fa-check fa-5x"></i>
+                    </div>
+                </div>
+                
+                <!-- Message -->
+                <h1 class="display-4 fw-bold mb-3 text-success">Paiement réussi !</h1>
+                <p class="lead mb-5">
+                    Votre paiement a été traité avec succès. Merci pour votre commande !
+                </p>
+                
+                <!-- Détails -->
+                <div class="card border-0 shadow-lg mb-5">
+                    <div class="card-body p-5">
+                        <div class="row g-4 text-start">
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Transaction ID</div>
+                                <h4 class="fw-bold">{{ payment.transaction_id }}</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Montant</div>
+                                <h4 class="fw-bold text-success">{{ payment.amount|floatformat:0 }} FCFA</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Méthode</div>
+                                <h5>{{ payment.payment_method.name }}</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-1 text-muted">Date</div>
+                                <h5>{{ payment.created_at|date:"d/m/Y à H:i" }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap mb-5">
+                    <a href="{% url 'accounts:order_list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-box me-2"></i> Voir mes commandes
+                    </a>
+                    <a href="{% url 'shop:product_list' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i> Continuer mes achats
+                    </a>
+                    <button class="btn btn-outline-secondary btn-lg" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i> Imprimer le reçu
+                    </button>
+                </div>
+                
+                <!-- Info supplémentaire -->
+                <div class="alert alert-info">
+                    <i class="fas fa-envelope me-2"></i>
+                    Un email de confirmation a été envoyé à votre adresse
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========================================
+    // CONFETTIS DE CÉLÉBRATION
+    // ========================================
+    function createConfetti() {
+        const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+        
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }, i * 30);
+        }
+    }
+    
+    // Lancer les confettis au chargement
+    createConfetti();
+    
+    // ========================================
+    // ANIMATION DE L'ICÔNE DE SUCCÈS
+    // ========================================
+    const successIcon = document.querySelector('.success-animation');
+    if (successIcon) {
+        setTimeout(() => {
+            successIcon.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                successIcon.style.transform = 'scale(1)';
+            }, 300);
+        }, 500);
+    }
+    
+});
+</script>
+{% endblock %}

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture {{ order.order_number }}</title>
+    <style>
+        /* ========================================
+           CONFIGURATION GÉNÉRALE - CSS SIMPLIFIÉ POUR XHTML2PDF
+           ======================================== */
+        
+        /* REMOVED: @page rules that cause issues with xhtml2pdf */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            margin: 2cm 1.5cm;
+        }
+
+        /* ========================================
+           EN-TÊTE DE LA FACTURE
+           ======================================== */
+        .invoice-header {
+            display: table;
+            width: 100%;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2c3e50;
+        }
+
+        .header-left {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+        }
+
+        .header-right {
+            display: table-cell;
+            width: 50%;
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .company-name {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .company-details {
+            font-size: 9pt;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .invoice-title {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .invoice-number {
+            font-size: 11pt;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .invoice-date {
+            font-size: 10pt;
+            color: #666;
+        }
+
+        /* ========================================
+           INFORMATIONS CLIENT & LIVRAISON
+           ======================================== */
+        .info-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            display: table-cell;
+            width: 48%;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+
+        .info-box + .info-box {
+            margin-left: 4%;
+        }
+
+        .info-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .info-content {
+            font-size: 10pt;
+            line-height: 1.8;
+        }
+
+        .info-content strong {
+            color: #2c3e50;
+        }
+
+        /* ========================================
+           TABLEAU DES ARTICLES
+           ======================================== */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table thead {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .items-table thead th {
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 10pt;
+            font-weight: bold;
+            border: 1px solid #2c3e50;
+        }
+
+        .items-table thead th:last-child,
+        .items-table thead th:nth-child(3),
+        .items-table thead th:nth-child(4) {
+            text-align: right;
+        }
+
+        .items-table tbody td {
+            padding: 10px 8px;
+            border: 1px solid #dee2e6;
+            font-size: 10pt;
+        }
+
+        .items-table tbody td:last-child,
+        .items-table tbody td:nth-child(3),
+        .items-table tbody td:nth-child(4) {
+            text-align: right;
+        }
+
+        .items-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .variant-details {
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* ========================================
+           TOTAUX
+           ======================================== */
+        .totals-section {
+            width: 50%;
+            margin-left: 50%;
+            margin-bottom: 30px;
+        }
+
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .totals-table tr {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .totals-table td {
+            padding: 10px 8px;
+            font-size: 10pt;
+        }
+
+        .totals-table td:first-child {
+            text-align: right;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .totals-table td:last-child {
+            text-align: right;
+            width: 40%;
+        }
+
+        .total-row {
+            background-color: #2c3e50;
+            color: white;
+            font-size: 12pt;
+            font-weight: bold;
+        }
+
+        .total-row td {
+            padding: 15px 8px;
+        }
+
+        .discount-row {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .discount-row td {
+            color: #27ae60;
+        }
+
+        /* ========================================
+           STATUT DE LA COMMANDE
+           ======================================== */
+        .status-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+        .status-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-size: 10pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background-color: #f39c12; color: white; }
+        .status-confirmed { background-color: #3498db; color: white; }
+        .status-processing { background-color: #9b59b6; color: white; }
+        .status-shipped { background-color: #1abc9c; color: white; }
+        .status-delivered { background-color: #27ae60; color: white; }
+        .status-cancelled { background-color: #e74c3c; color: white; }
+
+        /* ========================================
+           INFORMATIONS DE PAIEMENT
+           ======================================== */
+        .payment-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #fff9e6;
+            border: 1px solid #ffd966;
+        }
+
+        .payment-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .payment-info {
+            font-size: 10pt;
+            line-height: 1.8;
+        }
+
+        /* ========================================
+           NOTES ET CONDITIONS
+           ======================================== */
+        .notes-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        .notes-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .notes-content {
+            font-size: 9pt;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* ========================================
+           PIED DE PAGE
+           ======================================== */
+        .invoice-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .footer-message {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .footer-contact {
+            line-height: 1.8;
+        }
+
+        /* ========================================
+           UTILITAIRES
+           ======================================== */
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-bold {
+            font-weight: bold;
+        }
+
+        .text-muted {
+            color: #666;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        /* ========================================
+           NUMÉRO DE PAGE (ALTERNATIVE SIMPLE)
+           ======================================== */
+        .page-number {
+            position: fixed;
+            bottom: 1cm;
+            right: 1.5cm;
+            font-size: 9pt;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================
+         EN-TÊTE DE LA FACTURE
+         ======================================== -->
+    <div class="invoice-header">
+        <div class="header-left">
+            <div class="company-name">{{ shop_name|default:"Mon Commerce" }}</div>
+            <div class="company-details">
+                {{ shop_address|default:"Adresse du commerce" }}<br>
+                Tél : {{ shop_phone|default:"+241 XX XX XX XX" }}<br>
+                Email : {{ shop_email|default:"contact@commerce.ga" }}<br>
+                Web : {{ shop_website|default:"www.commerce.ga" }}
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="invoice-title">FACTURE</div>
+            <div class="invoice-number">N° {{ order.order_number }}</div>
+            <div class="invoice-date">Date : {{ order.created_at|date:"d/m/Y à H:i" }}</div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         INFORMATIONS CLIENT & LIVRAISON
+         ======================================== -->
+    <div class="info-section">
+        <div class="info-box">
+            <div class="info-title">INFORMATIONS CLIENT</div>
+            <div class="info-content">
+                <strong>
+                    {% if order.customer.user.get_full_name %}
+                        {{ order.customer.user.get_full_name }}
+                    {% else %}
+                        {{ order.customer.user.username }}
+                    {% endif %}
+                </strong><br>
+                Email : {{ order.customer_email }}<br>
+                Téléphone : {{ order.customer_phone|default:"Non renseigné" }}<br>
+                {% if order.customer.user.date_joined %}
+                    Client depuis : {{ order.customer.user.date_joined|date:"d/m/Y" }}<br>
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-box">
+            <div class="info-title">ADRESSE DE LIVRAISON</div>
+            <div class="info-content">
+                <strong>{{ order.shipping_address.full_name }}</strong><br>
+                {{ order.shipping_address.address_line1 }}<br>
+                {% if order.shipping_address.address_line2 %}
+                    {{ order.shipping_address.address_line2 }}<br>
+                {% endif %}
+                {{ order.shipping_address.city }}{% if order.shipping_address.postal_code %}, {{ order.shipping_address.postal_code }}{% endif %}<br>
+                {{ order.shipping_address.country }}<br>
+                Tél : {{ order.shipping_address.phone }}
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         STATUT DE LA COMMANDE
+         ======================================== -->
+    <div class="status-section">
+        <div class="status-title">Statut de la commande</div>
+        <span class="status-badge status-{{ order.status }}">
+            {{ order.get_status_display }}
+        </span>
+        <span style="margin-left: 20px; font-size: 9pt; color: #666;">
+            Mode de livraison : {{ order.shipping_rate.get_delivery_type_display }} - {{ order.shipping_zone.name }}
+        </span>
+    </div>
+
+    <!-- ========================================
+         TABLEAU DES ARTICLES
+         ======================================== -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 45%;">PRODUIT</th>
+                <th style="width: 20%;">PRIX UNITAIRE</th>
+                <th style="width: 15%;">QUANTITÉ</th>
+                <th style="width: 20%;">TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>
+                    <div class="product-name">{{ item.product_name }}</div>
+                    {% if item.variant_details %}
+                    <div class="variant-details">{{ item.variant_details }}</div>
+                    {% endif %}
+                </td>
+                <td class="text-right">{{ item.unit_price|floatformat:0 }} FCFA</td>
+                <td class="text-right">{{ item.quantity }}</td>
+                <td class="text-right">{{ item.subtotal|floatformat:0 }} FCFA</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ========================================
+         TOTAUX
+         ======================================== -->
+    <div class="totals-section">
+        <table class="totals-table">
+            <tr>
+                <td>Sous-total :</td>
+                <td>{{ order.subtotal|floatformat:0 }} FCFA</td>
+            </tr>
+            <tr>
+                <td>Frais de livraison :</td>
+                <td>
+                    {% if order.shipping_cost == 0 %}
+                        <span style="color: #27ae60; font-weight: bold;">GRATUIT</span>
+                    {% else %}
+                        {{ order.shipping_cost|floatformat:0 }} FCFA
+                    {% endif %}
+                </td>
+            </tr>
+            {% if order.tax_amount and order.tax_amount > 0 %}
+            <tr>
+                <td>Taxes :</td>
+                <td>{{ order.tax_amount|floatformat:0 }} FCFA</td>
+            </tr>
+            {% endif %}
+            {% if order.discount_amount and order.discount_amount > 0 %}
+            <tr class="discount-row">
+                <td>Réduction {% if order.coupon_code %}({{ order.coupon_code }}){% endif %} :</td>
+                <td>- {{ order.discount_amount|floatformat:0 }} FCFA</td>
+            </tr>
+            {% endif %}
+            <tr class="total-row">
+                <td>TOTAL À PAYER :</td>
+                <td>{{ order.total|floatformat:0 }} FCFA</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ========================================
+         INFORMATIONS DE PAIEMENT
+         ======================================== -->
+    <div class="payment-section">
+        <div class="payment-title">Informations de paiement</div>
+        <div class="payment-info">
+            <strong>Méthode de paiement :</strong> 
+            {% if order.payment_method == 'cod' %}
+                Paiement à la livraison (espèces)
+            {% elif order.payment_method == 'airtel' %}
+                Airtel Money
+            {% elif order.payment_method == 'moov' %}
+                Moov Money
+            {% else %}
+                {{ order.get_payment_method_display }}
+            {% endif %}
+            <br>
+            
+            {% if order.is_paid %}
+                <strong style="color: #27ae60;">✓ Paiement confirmé</strong>
+                {% if order.paid_at %}
+                    le {{ order.paid_at|date:"d/m/Y à H:i" }}
+                {% endif %}
+            {% elif order.payment_status == 'pending' %}
+                <strong style="color: #f39c12;">⏳ En attente de paiement</strong>
+            {% elif order.payment_status == 'failed' %}
+                <strong style="color: #e74c3c;">✗ Paiement échoué</strong>
+            {% else %}
+                <strong style="color: #f39c12;">⏳ En attente de paiement</strong>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ========================================
+         NOTES CLIENT
+         ======================================== -->
+    {% if order.delivery_notes %}
+    <div class="notes-section">
+        <div class="notes-title">Notes de livraison</div>
+        <div class="notes-content">
+            {{ order.delivery_notes }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========================================
+         CONDITIONS GÉNÉRALES
+         ======================================== -->
+    <div class="notes-section">
+        <div class="notes-title">Conditions générales</div>
+        <div class="notes-content">
+            Cette facture est émise sous réserve de nos conditions générales de vente disponibles sur notre site web.
+            En cas de retard de livraison, veuillez nous contacter au {{ shop_phone|default:"+241 XX XX XX XX" }}.
+            Les produits peuvent être retournés dans un délai de 14 jours suivant la réception.
+        </div>
+    </div>
+
+    <!-- ========================================
+         PIED DE PAGE
+         ======================================== -->
+    <div class="invoice-footer">
+        <div class="footer-message">Merci pour votre confiance !</div>
+        <div class="footer-contact">
+            {{ shop_name|default:"Mon Commerce" }} - {{ shop_address|default:"Adresse du commerce" }}<br>
+            Tél : {{ shop_phone|default:"+241 XX XX XX XX" }} | Email : {{ shop_email|default:"contact@commerce.ga" }} | Web : {{ shop_website|default:"www.commerce.ga" }}
+        </div>
+    </div>
+
+    <!-- Numéro de page simple (alternative à @page) -->
+    <div class="page-number">
+        Page 1
+    </div>
+
+</body>
+</html>

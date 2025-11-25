@@ -1,0 +1,1880 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil - E-Commerce Gabon{% endblock %}
+
+{% block meta_description %}
+Découvrez E-Commerce Gabon, votre partenaire shopping de confiance. Large sélection de produits de qualité avec livraison rapide à Libreville et ses environs.
+{% endblock %}
+
+{% block content %}
+
+<!-- ========================================
+     HERO SECTION MODERNE
+     ======================================== -->
+<section class="hero-modern">
+    <div class="hero-bg-pattern"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+                <div class="hero-content">
+                    <span class="hero-badge">
+                        <i class="fas fa-bolt"></i> Nouvelle Collection 2024
+                    </span>
+                    <h1 class="hero-title">
+                        Votre Shopping,
+                        <span class="gradient-text">Simplifié</span>
+                    </h1>
+                    <p class="hero-description">
+                        Découvrez une expérience d'achat unique au Gabon. Des produits de qualité, 
+                        des prix compétitifs et une livraison rapide partout à Libreville.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{% url 'shop:product_list' %}" class="btn-modern btn-modern-primary">
+                            <span>Découvrir la boutique</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a href="{% url 'core:about' %}" class="btn-modern btn-modern-ghost">
+                            <span>En savoir plus</span>
+                        </a>
+                    </div>
+                    
+                    <!-- Stats rapides -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>5000+</h4>
+                                <p>Clients satisfaits</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>10k+</h4>
+                                <p>Commandes livrées</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4>4.8/5</h4>
+                                <p>Note moyenne</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="hero-visual">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Livraison Rapide</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Paiement Sécurisé</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-headset"></i>
+                        <span>Support 24/7</span>
+                    </div>
+                    <div class="hero-image-container">
+                        <div class="hero-image-bg"></div>
+                        <i class="fas fa-shopping-cart hero-main-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- ========================================
+     CATÉGORIES PRINCIPALES
+     ======================================== -->
+{% if main_categories %}
+<section class="section-modern categories-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Explorer</span>
+            <h2 class="section-title">Nos Catégories</h2>
+            <p class="section-subtitle">
+                Trouvez exactement ce que vous cherchez
+            </p>
+        </div>
+        
+        <div class="categories-grid">
+            {% for category in main_categories %}
+            <a href="{% url 'shop:category_detail' category.slug %}" class="category-card-modern" data-aos="fade-up">
+                <div class="category-image-wrapper">
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}" class="category-image">
+                    {% else %}
+                    <div class="category-image-placeholder">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    {% endif %}
+                    <div class="category-overlay">
+                        <div class="category-content">
+                            <h3 class="category-name">{{ category.name }}</h3>
+                            <p class="category-count">
+                                {{ category.products.count }} produit{{ category.products.count|pluralize }}
+                            </p>
+                            <div class="category-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ========================================
+     PRODUITS PHARES
+     ======================================== -->
+{% if featured_products %}
+<section class="section-modern products-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Sélection</span>
+            <h2 class="section-title">Produits Phares</h2>
+            <p class="section-subtitle">
+                Notre sélection des produits les plus populaires
+            </p>
+        </div>
+        
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <div class="product-card-modern" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 2 100 %}">
+                <!-- Badges -->
+                <div class="product-badges">
+                    {% if product.has_discount %}
+                    <span class="badge-modern badge-sale">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                    {% if product.is_new %}
+                    <span class="badge-modern badge-new">Nouveau</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Image -->
+                <a href="{% url 'shop:product_detail' product.slug %}" class="product-image-link">
+                    <div class="product-image-container">
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="product-img">
+                        <div class="product-actions">
+                            <button class="action-btn" title="Aperçu rapide">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" title="Ajouter au panier">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                            <button class="action-btn" title="Ajouter aux favoris">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Contenu -->
+                <div class="product-content">
+                    <span class="product-category">{{ product.category.name }}</span>
+                    
+                    <h3 class="product-name">
+                        <a href="{% url 'shop:product_detail' product.slug %}">
+                            {{ product.name }}
+                        </a>
+                    </h3>
+                    
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <span class="rating-count">({{ product.views_count }})</span>
+                    </div>
+                    
+                    <div class="product-footer">
+                        <div class="product-pricing">
+                            <span class="current-price">{{ product.current_price }} FCFA</span>
+                            {% if product.has_discount %}
+                            <span class="old-price">{{ product.base_price }} FCFA</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'shop:product_detail' product.slug %}" class="btn-add-cart">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{% url 'shop:product_list' %}" class="btn-modern btn-modern-outline-large">
+                <span>Voir tous les produits</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ========================================
+     BANNIÈRE PROMOTIONNELLE
+     ======================================== -->
+{% if active_promotions %}
+<section class="section-modern promo-section">
+    <div class="container">
+        {% for promotion in active_promotions %}
+        <div class="promo-banner-modern" data-aos="zoom-in">
+            <div class="promo-bg-pattern"></div>
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-4 mb-lg-0">
+                    <div class="promo-content">
+                        <span class="promo-label">Offre Spéciale</span>
+                        <h2 class="promo-title">{{ promotion.name }}</h2>
+                        <p class="promo-description">{{ promotion.description }}</p>
+                        <a href="{% url 'shop:product_list' %}" class="btn-modern btn-modern-light">
+                            <span>Profiter de l'offre</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="promo-discount">
+                        <div class="discount-circle">
+                            <span class="discount-value">
+                                {% if promotion.discount_type == 'percentage' %}
+                                {{ promotion.discount_value }}%
+                                {% else %}
+                                {{ promotion.discount_value }}
+                                {% endif %}
+                            </span>
+                            <span class="discount-label">DE REMISE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ========================================
+     POURQUOI NOUS CHOISIR
+     ======================================== -->
+<section class="section-modern features-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Avantages</span>
+            <h2 class="section-title">Pourquoi Nous Choisir</h2>
+            <p class="section-subtitle">
+                Une expérience d'achat exceptionnelle
+            </p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card-modern" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                </div>
+                <h3 class="feature-title">Livraison Rapide</h3>
+                <p class="feature-text">
+                    Recevez vos commandes en 24-48h à Libreville et ses environs
+                </p>
+            </div>
+            
+            <div class="feature-card-modern" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+                <h3 class="feature-title">Paiement Sécurisé</h3>
+                <p class="feature-text">
+                    Transactions 100% sécurisées avec cryptage SSL
+                </p>
+            </div>
+            
+            <div class="feature-card-modern" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                </div>
+                <h3 class="feature-title">Retours Faciles</h3>
+                <p class="feature-text">
+                    14 jours pour retourner vos produits sans frais
+                </p>
+            </div>
+            
+            <div class="feature-card-modern" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-icon-wrapper">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                </div>
+                <h3 class="feature-title">Support 24/7</h3>
+                <p class="feature-text">
+                    Notre équipe est disponible pour vous aider à tout moment
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     TÉMOIGNAGES
+     ======================================== -->
+<section class="section-modern testimonials-section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <span class="section-badge">Avis</span>
+            <h2 class="section-title">Ce Que Disent Nos Clients</h2>
+            <p class="section-subtitle">
+                Des milliers de clients satisfaits nous font confiance
+            </p>
+        </div>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Amélie Kokou</h4>
+                        <p>Cliente depuis 2024</p>
+                    </div>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">
+                    "Excellente expérience d'achat ! Les produits sont de qualité et la livraison 
+                    a été rapide. Je recommande vivement."
+                </p>
+            </div>
+            
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar avatar-success">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Koffi Mensah</h4>
+                        <p>Client depuis 2023</p>
+                    </div>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">
+                    "Service client exceptionnel ! J'ai eu un problème avec ma commande et 
+                    l'équipe a tout résolu rapidement. Bravo !"
+                </p>
+            </div>
+            
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-header">
+                    <div class="testimonial-avatar avatar-info">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Afi Dosseh</h4>
+                        <p>Cliente depuis 2024</p>
+                    </div>
+                </div>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="testimonial-text">
+                    "Large choix de produits et prix compétitifs. Le site est facile à utiliser 
+                    et les paiements sont sécurisés."
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     NEWSLETTER MODERNE
+     ======================================== -->
+<section class="section-modern newsletter-section">
+    <div class="newsletter-bg-pattern"></div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+                <div class="newsletter-content">
+                    <span class="newsletter-badge">
+                        <i class="fas fa-envelope"></i> Newsletter
+                    </span>
+                    <h2 class="newsletter-title">
+                        Restez Informé de Nos
+                        <span class="gradient-text">Offres Exclusives</span>
+                    </h2>
+                    <p class="newsletter-description">
+                        Inscrivez-vous pour recevoir nos nouveautés, promotions et conseils d'achat
+                    </p>
+                    <ul class="newsletter-benefits">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Offres exclusives réservées aux abonnés</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Nouveautés en avant-première</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Conseils et astuces d'achat</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="newsletter-form-card">
+                    <form method="post" action="#" class="newsletter-form-modern">
+                        {% csrf_token %}
+                        <div class="form-group-modern">
+                            <label for="newsletter-name">Nom complet</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="newsletter-name" placeholder="Votre nom" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group-modern">
+                            <label for="newsletter-email">Adresse email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="newsletter-email" placeholder="votre@email.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check-modern">
+                            <input type="checkbox" id="newsletter-consent" required>
+                            <label for="newsletter-consent">
+                                J'accepte de recevoir des emails promotionnels et d'être informé(e) des nouveautés
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn-modern btn-modern-primary btn-full">
+                            <span>S'abonner maintenant</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================
+     STYLES CSS
+     ======================================== -->
+<style>
+/* ===================================
+   VARIABLES
+   =================================== */
+:root {
+    --primary-color: #e74c3c;
+    --primary-hover: #ff6b6b;
+    --dark-bg: #1a1a2e;
+    --darker-bg: #16213e;
+    --text-dark: #2c3e50;
+    --text-muted: #6c757d;
+    --text-light: #ffffff;
+    --bg-light: #f8f9fa;
+    --success-color: #28a745;
+    --info-color: #17a2b8;
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===================================
+   UTILITAIRES
+   =================================== */
+.section-modern {
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Section Header */
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--primary-color);
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Boutons Modernes */
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: left 0.5s ease;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+.btn-modern-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    box-shadow: 0 8px 24px rgba(231, 76, 60, 0.3);
+}
+
+.btn-modern-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(231, 76, 60, 0.4);
+    color: white;
+}
+
+.btn-modern-ghost {
+    background: transparent;
+    color: var(--text-dark);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-modern-ghost:hover {
+    background: var(--text-dark);
+    color: white;
+    border-color: var(--text-dark);
+}
+
+.btn-modern-outline-large {
+    padding: 16px 48px;
+    font-size: 1.125rem;
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-modern-outline-large:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-modern-light {
+    background: white;
+    color: var(--primary-color);
+}
+
+.btn-modern-light:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* ===================================
+   HERO SECTION
+   =================================== */
+.hero-modern {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    position: relative;
+    padding: 120px 0 80px;
+    overflow: hidden;
+}
+
+.hero-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 25px;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 35px;
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-icon i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.stat-content h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.stat-content p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+/* Hero Visual */
+.hero-visual {
+    position: relative;
+    height: 500px;
+}
+
+.hero-image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image-bg {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.hero-main-icon {
+    font-size: 12rem;
+    color: rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.floating-card {
+    position: absolute;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    animation: float 3s ease-in-out infinite;
+    z-index: 2;
+}
+
+.floating-card i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.card-1 {
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    top: 50%;
+    right: 10%;
+    animation-delay: 1s;
+}
+
+.card-3 {
+    bottom: 15%;
+    left: 10%;
+    animation-delay: 2s;
+}
+
+.hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.hero-wave svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 80px;
+}
+
+.hero-wave path {
+    fill: #ffffff;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.15;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ===================================
+   CATÉGORIES
+   =================================== */
+.categories-section {
+    background: white;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.category-card-modern {
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    height: 300px;
+    display: block;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.category-card-modern:hover {
+    transform: translateY(-10px);
+}
+
+.category-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.category-card-modern:hover .category-image {
+    transform: scale(1.1);
+}
+
+.category-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--dark-bg), var(--darker-bg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-image-placeholder i {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 25px;
+    transition: var(--transition);
+}
+
+.category-card-modern:hover .category-overlay {
+    background: linear-gradient(to top, rgba(231, 76, 60, 0.9), rgba(231, 76, 60, 0.7));
+}
+
+.category-content {
+    color: white;
+    width: 100%;
+}
+
+.category-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.category-count {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.category-arrow {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    margin-top: 10px;
+}
+
+.category-arrow i {
+    color: var(--primary-color);
+    transition: var(--transition);
+}
+
+.category-card-modern:hover .category-arrow {
+    transform: translateX(5px);
+}
+
+/* ===================================
+   PRODUITS
+   =================================== */
+.products-section {
+    background: var(--bg-light);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.product-card-modern {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+
+.product-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.product-badges {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.badge-modern {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-sale {
+    background: var(--primary-color);
+    color: white;
+}
+
+.badge-new {
+    background: var(--success-color);
+    color: white;
+}
+
+.product-image-link {
+    display: block;
+    text-decoration: none;
+}
+
+.product-image-container {
+    position: relative;
+    height: 280px;
+    background: var(--bg-light);
+    overflow: hidden;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.product-card-modern:hover .product-img {
+    transform: scale(1.1);
+}
+
+.product-actions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.product-card-modern:hover .product-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.product-content {
+    padding: 20px;
+}
+
+.product-category {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.product-name a {
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.product-name a:hover {
+    color: var(--primary-color);
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+}
+
+.stars i {
+    color: #ffc107;
+    font-size: 0.875rem;
+}
+
+.rating-count {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product-pricing {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.current-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.old-price {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+.btn-add-cart {
+    width: 45px;
+    height: 45px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn-add-cart:hover {
+    background: var(--primary-hover);
+    transform: scale(1.1);
+    color: white;
+}
+
+/* ===================================
+   PROMO BANNER
+   =================================== */
+.promo-section {
+    background: white;
+}
+
+.promo-banner-modern {
+    background: linear-gradient(135deg, var(--dark-bg), var(--darker-bg));
+    border-radius: 20px;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.promo-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.promo-content {
+    position: relative;
+    z-index: 2;
+}
+
+.promo-label {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(231, 76, 60, 0.2);
+    color: var(--primary-color);
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 15px;
+}
+
+.promo-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.promo-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 25px;
+}
+
+.promo-discount {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.discount-circle {
+    width: 200px;
+    height: 200px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    animation: pulse-discount 2s ease-in-out infinite;
+}
+
+.discount-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.discount-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 5px;
+}
+
+@keyframes pulse-discount {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ===================================
+   FEATURES
+   =================================== */
+.features-section {
+    background: white;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card-modern {
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: var(--border-radius);
+    background: white;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.feature-card-modern:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(231, 76, 60, 0.1);
+}
+
+.feature-icon-wrapper {
+    margin-bottom: 20px;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: var(--transition);
+}
+
+.feature-card-modern:hover .feature-icon {
+    transform: rotate(5deg) scale(1.1);
+}
+
+.feature-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.feature-text {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* ===================================
+   TÉMOIGNAGES
+   =================================== */
+.testimonials-section {
+    background: var(--bg-light);
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.testimonial-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    transition: var(--transition);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.testimonial-avatar i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.avatar-success {
+    background: linear-gradient(135deg, var(--success-color), #20c997);
+}
+
+.avatar-info {
+    background: linear-gradient(135deg, var(--info-color), #5bc0de);
+}
+
+.testimonial-author h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.testimonial-author p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.testimonial-rating {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 15px;
+}
+
+.testimonial-rating i {
+    color: #ffc107;
+    font-size: 1rem;
+}
+
+.testimonial-text {
+    color: var(--text-muted);
+    line-height: 1.8;
+    font-style: italic;
+}
+
+/* ===================================
+   NEWSLETTER
+   =================================== */
+.newsletter-section {
+    background: linear-gradient(135deg, var(--dark-bg), var(--darker-bg));
+    position: relative;
+    overflow: hidden;
+}
+
+.newsletter-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(231, 76, 60, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.newsletter-content {
+    position: relative;
+    z-index: 2;
+}
+
+.newsletter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+}
+
+.newsletter-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.newsletter-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+}
+
+.newsletter-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.newsletter-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.newsletter-benefits i {
+    color: var(--success-color);
+    font-size: 1.25rem;
+}
+
+.newsletter-form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+}
+
+.form-group-modern {
+    margin-bottom: 20px;
+}
+
+.form-group-modern label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 18px 14px 50px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+}
+
+.form-check-modern {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.form-check-modern input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.form-check-modern label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 991.98px) {
+    .section-modern {
+        padding: 60px 0;
+    }
+    
+    .hero-modern {
+        padding: 80px 0 60px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-visual {
+        height: 350px;
+    }
+    
+    .hero-main-icon {
+        font-size: 8rem;
+    }
+    
+    .floating-card {
+        display: none;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .promo-title {
+        font-size: 2rem;
+    }
+    
+    .newsletter-title {
+        font-size: 2rem;
+    }
+    
+    .discount-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .discount-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+    }
+    
+    .categories-grid,
+    .products-grid,
+    .features-grid,
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .promo-banner-modern {
+        padding: 40px 20px;
+    }
+    
+    .newsletter-form-card {
+        padding: 30px 20px;
+    }
+}
+
+/* ===================================
+   ANIMATIONS AOS
+   =================================== */
+[data-aos] {
+    pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-aos] {
+        transition-duration: 0.01ms !important;
+    }
+    
+    .floating-card,
+    .hero-image-bg,
+    .discount-circle {
+        animation: none !important;
+    }
+}
+</style>
+
+<!-- ========================================
+     SCRIPT JAVASCRIPT
+     ======================================== -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+(function() {
+    'use strict';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // ===================================
+        // INITIALISATION AOS (ANIMATIONS)
+        // ===================================
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out-cubic',
+                once: true,
+                offset: 50,
+                delay: 100
+            });
+        }
+        
+        // ===================================
+        // GESTION DES ACTIONS PRODUITS
+        // ===================================
+        const actionButtons = document.querySelectorAll('.action-btn');
+        
+        actionButtons.forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const icon = this.querySelector('i');
+                const isCart = icon.classList.contains('fa-shopping-cart');
+                const isHeart = icon.classList.contains('fa-heart');
+                
+                if (isCart) {
+                    // Ajouter au panier
+                    console.log('Ajout au panier');
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+                    }, 1500);
+                } else if (isHeart) {
+                    // Toggle favoris
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.style.color = 'var(--primary-color)';
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        this.style.color = '';
+                    }
+                }
+            });
+        });
+        
+        // ===================================
+        // GESTION FORMULAIRE NEWSLETTER
+        // ===================================
+        const newsletterForm = document.querySelector('.newsletter-form-modern');
+        
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const button = this.querySelector('button[type="submit"]');
+                const originalContent = button.innerHTML;
+                
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Inscription en cours...</span>';
+                
+                // Simuler l'envoi (remplacer par votre logique)
+                setTimeout(function() {
+                    button.innerHTML = '<i class="fas fa-check"></i> <span>Inscription réussie !</span>';
+                    
+                    setTimeout(function() {
+                        button.disabled = false;
+                        button.innerHTML = originalContent;
+                        newsletterForm.reset();
+                    }, 2000);
+                }, 1500);
+            });
+        }
+        
+        // ===================================
+        // COMPTEUR ANIMÉ POUR LES STATS
+        // ===================================
+        function animateCounter(element) {
+            const target = parseInt(element.textContent.replace(/\D/g, ''));
+            const suffix = element.textContent.replace(/[0-9]/g, '');
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(function() {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target + suffix;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current) + suffix;
+                }
+            }, 16);
+        }
+        
+        // Observer pour les stats
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    const h4 = entry.target.querySelector('h4');
+                    if (h4 && !h4.classList.contains('animated')) {
+                        h4.classList.add('animated');
+                        animateCounter(h4);
+                    }
+                }
+            });
+        });
+        
+        document.querySelectorAll('.stat-item').forEach(function(stat) {
+            statsObserver.observe(stat);
+        });
+        
+        // ===================================
+        // LAZY LOADING DES IMAGES
+        // ===================================
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src || img.src;
+                        img.classList.add('loaded');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('img[data-src]').forEach(function(img) {
+                imageObserver.observe(img);
+            });
+        }
+        
+        // ===================================
+        // SMOOTH SCROLL
+        // ===================================
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+        
+        // ===================================
+        // PARALLAX EFFECT (LÉGER)
+        // ===================================
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.hero-image-bg');
+            
+            parallaxElements.forEach(function(el) {
+                const speed = 0.5;
+                el.style.transform = 'translateY(' + scrolled * speed + 'px)';
+            });
+        }, { passive: true });
+        
+        console.log('Homepage moderne initialisée');
+    });
+})();
+</script>
+
+<!-- Lien AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+{% endblock %}
