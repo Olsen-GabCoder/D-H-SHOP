@@ -36,9 +36,10 @@ crispy-bootstrap5==2024.2
 # ========================================
 Pillow==10.3.0
 reportlab==4.1.0
+xhtml2pdf==0.2.17  # ← ✅ AJOUTEZ CETTE LIGNE
 
 # ========================================
 # SECURITY & UTILITIES
 # ========================================
 defusedxml==0.7.1
-python-stdnum==1.19.0
+python-stdnum==1.19
