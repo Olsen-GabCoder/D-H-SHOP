@@ -59,10 +59,11 @@ INSTALLED_APPS = [
 ]
 
 # ========================================
-# MIDDLEWARE - WHITENOISE CONDITIONNEL
+# MIDDLEWARE - WHITENOISE OBLIGATOIRE
 # ========================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ TOUJOURS ACTIVÉ
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,15 +72,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Ajouter WhiteNoise seulement si installé
-try:
-    import whitenoise
-    # Insérer WhiteNoise après SecurityMiddleware
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    WHITENOISE_INSTALLED = True
-except ImportError:
-    WHITENOISE_INSTALLED = False
-    print("⚠️  WhiteNoise non installé - les fichiers statiques ne seront pas optimisés en production")
+# SUPPRIMER le bloc try/except WhiteNoise (lignes 73-81)
 
 ROOT_URLCONF = 'config.urls'
 
@@ -165,23 +158,53 @@ USE_TZ = True
 
 
 # ========================================
-# FICHIERS STATIQUES - WHITENOISE CONDITIONNEL
+# FICHIERS STATIQUES - CORRECTION PRODUCTION
 # ========================================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+
+# ✅ CORRECTION : STATICFILES_DIRS seulement en développement
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / 'static',
+    ]
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Configuration WhiteNoise seulement si installé
-if WHITENOISE_INSTALLED:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-    print("⚠️  Utilisation du stockage statique Django standard")
+# ✅ CORRECTION : Configuration moderne STORAGES
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# ========================================
+# STOCKAGE CLOUDINARY (Production)
+# ========================================
+if not DEBUG:
+    # Ajouter Cloudinary aux applications
+    INSTALLED_APPS = [
+        'cloudinary_storage',
+        'cloudinary',
+    ] + INSTALLED_APPS
+    
+    # Configuration Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+        'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+        'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+    }
+    
+    # Remplacer le stockage par défaut par Cloudinary
+    STORAGES['default'] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
 
 
 # Default primary key field type
@@ -200,28 +223,15 @@ LOGOUT_REDIRECT_URL = 'core:home'
 
 
 # ========================================
-# CONFIGURATION CACHE (CORRIGÉE)
+# CONFIGURATION CACHE (CORRIGÉE DÉFINITIVEMENT)
 # ========================================
-# Solution : Toujours utiliser le cache en mémoire, sauf si REDIS_URL est explicitement configurée
-if config('REDIS_URL', default=None):
-    # Utiliser Redis seulement si REDIS_URL est définie
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': config('REDIS_URL'),
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
-        }
+# FORCER le cache en mémoire - NE JAMAIS utiliser Redis sauf configuration explicite
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
-else:
-    # Fallback: Cache en mémoire (fonctionne partout - développement et production)
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-        }
-    }
+}
 
 
 # ========================================

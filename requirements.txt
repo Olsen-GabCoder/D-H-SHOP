@@ -43,3 +43,9 @@ xhtml2pdf==0.2.17  # ← ✅ AJOUTEZ CETTE LIGNE
 # ========================================
 defusedxml==0.7.1
 python-stdnum==1.19
+
+# ========================================
+# STOCKAGE CLOUD (Production)
+# ========================================
+cloudinary==1.41.0
+django-cloudinary-storage==0.3.0

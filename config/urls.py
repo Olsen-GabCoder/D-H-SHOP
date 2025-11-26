@@ -37,7 +37,10 @@ urlpatterns = [
     path('marketing/', include('marketing.urls', namespace='marketing')),
 ]
 
-# Servir les fichiers média en développement
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# ========================================
+# SERVIR LES FICHIERS MÉDIA EN DÉVELOPPEMENT ET PRODUCTION
+# ========================================
+# ✅ CORRECTION : Servir les médias même en production pendant la transition vers Cloudinary
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Les fichiers statiques sont gérés par WhiteNoise automatiquement, pas besoin de les ajouter ici
