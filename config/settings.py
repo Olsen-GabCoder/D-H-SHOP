@@ -200,27 +200,26 @@ LOGOUT_REDIRECT_URL = 'core:home'
 
 
 # ========================================
-# CONFIGURATION CACHE
+# CONFIGURATION CACHE (CORRIGÉE)
 # ========================================
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'TIMEOUT': 600,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
-    }
-}
-
-if not DEBUG:
+# Solution : Toujours utiliser le cache en mémoire, sauf si REDIS_URL est explicitement configurée
+if config('REDIS_URL', default=None):
+    # Utiliser Redis seulement si REDIS_URL est définie
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': config('REDIS_URL', default='redis://127.0.0.1:6379/1'),
+            'LOCATION': config('REDIS_URL'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             }
+        }
+    }
+else:
+    # Fallback: Cache en mémoire (fonctionne partout - développement et production)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
         }
     }
 
