@@ -156,11 +156,11 @@ USE_TZ = True
 
 
 # ========================================
-# FICHIERS STATIQUES - CONFIGURATION CORRIGÉE
+# FICHIERS STATIQUES - CONFIGURATION CORRIGÉE DÉFINITIVEMENT
 # ========================================
 STATIC_URL = '/static/'
 
-# ✅ CORRECTION CRITIQUE : TOUJOURS définir STATICFILES_DIRS (dev ET prod)
+# ✅ TOUJOURS définir STATICFILES_DIRS (dev ET prod)
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
@@ -168,22 +168,21 @@ STATICFILES_DIRS = [
 # STATIC_ROOT : où collectstatic copie les fichiers
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION DÉFINITIVE : Utiliser CompressedStaticFilesStorage sans manifest
+# ✅ CORRECTION DÉFINITIVE : ManifestStaticFilesStorage SANS compression
+# Cela évite les erreurs FileNotFoundError lors du post-processing
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
     },
 }
 
-# ✅ WhiteNoise : Configuration pour ignorer les fichiers manquants
+# ✅ WhiteNoise : Configuration pour mode non strict
 WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 WHITENOISE_AUTOREFRESH = DEBUG
 WHITENOISE_USE_FINDERS = DEBUG
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ('webmanifest', 'json', 'map', 'txt', 'xml')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
