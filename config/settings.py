@@ -72,8 +72,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# SUPPRIMER le bloc try/except WhiteNoise (lignes 73-81)
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -170,15 +168,18 @@ if DEBUG:
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION : Configuration moderne STORAGES
+# ✅ CORRECTION : Configuration STORAGES avec fallback pour éviter l'erreur WhiteNoise
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",  # ✅ CHANGEMENT ICI
     },
 }
+
+# ✅ Configuration WhiteNoise pour éviter les erreurs de fichiers manquants
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
