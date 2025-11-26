@@ -168,18 +168,17 @@ if DEBUG:
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION : Configuration STORAGES avec fallback pour éviter l'erreur WhiteNoise
+# ✅ CORRECTION : Utiliser le stockage statique Django standard (pas de compression)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",  # ✅ CHANGEMENT ICI
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",  # ✅ CHANGEMENT ICI
     },
 }
 
-# ✅ Configuration WhiteNoise pour éviter les erreurs de fichiers manquants
-WHITENOISE_MANIFEST_STRICT = False
+# SUPPRIMER la ligne WHITENOISE_MANIFEST_STRICT = False (elle n'est plus nécessaire)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
