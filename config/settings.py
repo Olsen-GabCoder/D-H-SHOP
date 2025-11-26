@@ -156,7 +156,7 @@ USE_TZ = True
 
 
 # ========================================
-# FICHIERS STATIQUES - CONFIGURATION PRODUCTION
+# FICHIERS STATIQUES - CONFIGURATION CORRIGÉE
 # ========================================
 STATIC_URL = '/static/'
 
@@ -169,20 +169,17 @@ if DEBUG:
 # Production : utiliser STATIC_ROOT seulement
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Configuration STORAGES pour WhiteNoise
+# ✅ CORRECTION : Utiliser le stockage Django standard (pas de compression)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",  # ✅ CHANGEMENT CRITIQUE
     },
 }
 
-# Configuration WhiteNoise
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_AUTOREFRESH = True
+# SUPPRIMER les configurations WHITENOISE_* (elles ne sont plus nécessaires)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -5,20 +5,11 @@ echo "🔧 Installation des dépendances..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-echo "🗑️  Nettoyage COMPLET des fichiers statiques..."
-rm -rf staticfiles
-mkdir -p staticfiles
+echo "🗑️  Nettoyage des anciens fichiers statiques..."
+rm -rf staticfiles || true
 
 echo "📁 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput --clear
-
-echo "🔍 Vérification des fichiers collectés..."
-echo "=== Structure de staticfiles ==="
-find staticfiles -type f -name "*.css" | head -10
-find staticfiles -type f -name "*.js" | head -10
-echo "=== Fichiers admin ==="
-ls -la staticfiles/admin/css/ | head -5
-echo "================================"
 
 echo "🔄 Application des migrations..."
 python manage.py migrate --noinput
