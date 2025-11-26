@@ -168,7 +168,7 @@ STATICFILES_DIRS = [
 # STATIC_ROOT : où collectstatic copie les fichiers
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION : Utiliser StaticFilesStorage simple pour éviter les erreurs de compression
+# ✅ CORRECTION : Configuration WhiteNoise avec mode non-strict pour éviter les erreurs
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -177,6 +177,10 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+# ✅ WhiteNoise : Configuration pour éviter les erreurs de fichiers manquants
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

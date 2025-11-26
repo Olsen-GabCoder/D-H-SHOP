@@ -8,8 +8,11 @@ pip install -r requirements.txt
 echo "🗑️  Nettoyage des anciens fichiers statiques..."
 rm -rf staticfiles || true
 
-echo "📁 Collecte des fichiers statiques..."
-python manage.py collectstatic --noinput
+echo "📁 Création du dossier staticfiles..."
+mkdir -p staticfiles
+
+echo "📦 Collecte des fichiers statiques..."
+python manage.py collectstatic --noinput --verbosity 2
 
 echo "🔄 Application des migrations..."
 python manage.py migrate --noinput
