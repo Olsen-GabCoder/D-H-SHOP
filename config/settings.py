@@ -168,13 +168,13 @@ STATICFILES_DIRS = [
 # STATIC_ROOT : où collectstatic copie les fichiers
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION DÉFINITIVE : Utiliser StaticFilesStorage sans compression pour éviter les erreurs
+# ✅ CORRECTION DÉFINITIVE : Utiliser CompressedStaticFilesStorage sans manifest
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
