@@ -160,26 +160,23 @@ USE_TZ = True
 # ========================================
 STATIC_URL = '/static/'
 
-# Développement : utiliser STATICFILES_DIRS
-if DEBUG:
-    STATICFILES_DIRS = [
-        BASE_DIR / 'static',
-    ]
+# ✅ CORRECTION CRITIQUE : TOUJOURS définir STATICFILES_DIRS (dev ET prod)
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
-# Production : utiliser STATIC_ROOT seulement
+# STATIC_ROOT : où collectstatic copie les fichiers
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ✅ CORRECTION : Utiliser le stockage Django standard (pas de compression)
+# Configuration du stockage des fichiers statiques
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",  # ✅ CHANGEMENT CRITIQUE
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-# SUPPRIMER les configurations WHITENOISE_* (elles ne sont plus nécessaires)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
