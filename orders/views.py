@@ -17,6 +17,7 @@ Toute la logique métier complexe est dans orders/services.py
 
 import logging
 from decimal import Decimal
+from threading import Thread
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -424,18 +425,19 @@ def checkout(request):
 def checkout_confirm(request):
     """
     Confirmation et création de la commande avec intégration complète.
+    VERSION CORRIGÉE : Gestion robuste des erreurs et timeout
     
     Architecture "Thin View" :
     1. Extraction des données de la requête
     2. Délégation au service de création de commande
     3. Gestion du résultat (succès/erreur)
-    4. Envoi de l'email de confirmation
+    4. Envoi de l'email de confirmation (ASYNCHRONE)
     5. Nettoyage de la session
     6. Redirection appropriée
     
     Fonctionnalités intégrées :
     - Support des codes promo
-    - Envoi d'email automatique (avec gestion d'erreur silencieuse)
+    - Envoi d'email automatique (non-bloquant)
     - Gestion multi-paiement (COD, Airtel, Moov)
     - Validation complète via le service
     """
@@ -474,18 +476,23 @@ def checkout_confirm(request):
     # ÉTAPE 3 : APPEL DU SERVICE DE CRÉATION
     # ============================================
     
-    result: OrderCreationResult = create_order_from_cart(
-        customer=request.user.customer,
-        cart=cart,
-        address_id=address_id,
-        shipping_rate_id=shipping_rate_id,
-        payment_method=payment_method,
-        delivery_notes=delivery_notes,
-        customer_email=request.user.email,
-        customer_phone=getattr(request.user.customer, 'phone', None),
-        coupon_code=coupon_code,
-        tax_amount=Decimal('0')  # TODO: Implémenter les taxes si nécessaire
-    )
+    try:
+        result: OrderCreationResult = create_order_from_cart(
+            customer=request.user.customer,
+            cart=cart,
+            address_id=address_id,
+            shipping_rate_id=shipping_rate_id,
+            payment_method=payment_method,
+            delivery_notes=delivery_notes,
+            customer_email=request.user.email,
+            customer_phone=getattr(request.user.customer, 'phone', None),
+            coupon_code=coupon_code,
+            tax_amount=Decimal('0')
+        )
+    except Exception as e:
+        logger.error(f"Erreur création commande: {str(e)}", exc_info=True)
+        messages.error(request, 'Une erreur est survenue lors de la création de votre commande.')
+        return redirect('orders:checkout')
     
     # ============================================
     # ÉTAPE 4 : GESTION DU RÉSULTAT
@@ -512,7 +519,6 @@ def checkout_confirm(request):
     request.session['payment_method'] = payment_method
     
     # Nettoyer les données du coupon de la session
-    # (Évite qu'il ne s'applique automatiquement à la prochaine commande)
     if 'coupon_code' in request.session:
         del request.session['coupon_code']
     if 'coupon_discount' in request.session:
@@ -534,21 +540,29 @@ def checkout_confirm(request):
     messages.success(request, success_message)
     
     # ============================================
-    # ÉTAPE 6 : ENVOI DE L'EMAIL DE CONFIRMATION
+    # ÉTAPE 6 : ENVOI EMAIL (NON-BLOQUANT)
     # ============================================
     
-    # Envoi silencieux : en cas d'erreur, on log mais on ne bloque pas le processus
+    # CRITIQUE : Envoi en try/except pour ne pas bloquer la commande
     try:
-        EmailService.send_order_confirmation(order)
-        messages.info(request, 'Un email de confirmation vous a été envoyé avec votre facture.')
+        def send_email_async():
+            """Envoi email dans un thread séparé pour éviter timeout"""
+            try:
+                EmailService.send_order_confirmation(order)
+                logger.info(f"Email envoyé avec succès pour {order.order_number}")
+            except Exception as email_error:
+                logger.error(f"Erreur envoi email async: {str(email_error)}", exc_info=True)
+        
+        # Lancer l'envoi dans un thread séparé
+        email_thread = Thread(target=send_email_async, daemon=True)
+        email_thread.start()
+        
+        # Informer l'utilisateur (sans attendre la fin de l'envoi)
+        messages.info(request, 'Un email de confirmation vous sera envoyé sous peu.')
+        
     except Exception as e:
-        # Log de l'erreur pour le suivi administratif
-        logger.error(
-            f"Échec de l'envoi de l'email de confirmation pour la commande {order.order_number}: {str(e)}",
-            exc_info=True
-        )
-        # On n'affiche pas d'erreur à l'utilisateur pour ne pas l'inquiéter
-        # La commande est créée avec succès, l'email n'est qu'un bonus
+        # Si le threading échoue, log mais ne bloque pas
+        logger.error(f"Impossible de lancer thread email: {str(e)}", exc_info=True)
     
     # ============================================
     # ÉTAPE 7 : REDIRECTION SELON LE PAIEMENT
