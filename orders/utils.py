@@ -3,7 +3,7 @@ orders/utils.py - Utilitaires pour la génération de PDF
 ========================================================
 
 Service de génération de factures PDF pour les commandes.
-VERSION CORRIGÉE : Gestion robuste des erreurs et timeout
+VERSION PRODUCTION : Gestion robuste des erreurs et timeout
 """
 
 import logging
@@ -157,6 +157,12 @@ def generate_invoice_pdf(order):
             'page_title': f'Facture {order.order_number}',
         }
         
+        # CORRECTION : Gestion robuste de l'attribut manquant get_payment_status_display
+        if not hasattr(order, 'get_payment_status_display'):
+            # Créer une méthode temporaire pour éviter l'erreur
+            order.get_payment_status_display = lambda: "En attente de paiement"
+            logger.warning(f"Méthode get_payment_status_display manquante pour la commande {order.order_number}, utilisation d'une valeur par défaut")
+        
         # Générer le PDF
         pdf_response = render_to_pdf('orders/invoice_pdf.html', context)
         
@@ -206,6 +212,12 @@ def generate_invoice_pdf_bytes(order):
             # Informations supplémentaires
             'page_title': f'Facture {order.order_number}',
         }
+        
+        # CORRECTION : Gestion robuste de l'attribut manquant get_payment_status_display
+        if not hasattr(order, 'get_payment_status_display'):
+            # Créer une méthode temporaire pour éviter l'erreur
+            order.get_payment_status_display = lambda: "En attente de paiement"
+            logger.warning(f"Méthode get_payment_status_display manquante pour la commande {order.order_number}, utilisation d'une valeur par défaut")
         
         # Générer le PDF en bytes
         pdf_bytes = render_to_pdf_bytes('orders/invoice_pdf.html', context)

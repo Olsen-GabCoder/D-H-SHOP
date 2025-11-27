@@ -1,6 +1,6 @@
 """
 Service centralisé pour l'envoi d'emails transactionnels
-Version corrigée - Problèmes d'encodage et logging résolus
+Version production - Configuration robuste pour environnement de production
 """
 
 from django.core.mail import EmailMultiAlternatives
@@ -9,7 +9,7 @@ from django.conf import settings
 from django.utils.html import strip_tags
 import logging
 
-# Import du service PDF CORRIGÉ
+# Import du service PDF
 from orders.utils import generate_invoice_pdf_bytes
 
 logger = logging.getLogger('core.email_service')
@@ -18,6 +18,7 @@ logger = logging.getLogger('core.email_service')
 class EmailService:
     """
     Service centralisé pour gérer l'envoi d'emails transactionnels
+    Version production - Gestion robuste des erreurs et logs détaillés
     """
     
     @staticmethod
@@ -57,7 +58,7 @@ class EmailService:
     def send_email(subject, template_name, context, recipient_list, fail_silently=False, attachment=None):
         """
         Méthode générique pour envoyer un email avec template HTML et texte
-        CORRIGÉ : Problème de double formatage résolu + logging sans émojis
+        VERSION CORRIGÉE : Gestion correcte du retour SMTP et logs détaillés
         """
         try:
             # Ajouter les informations de la boutique au contexte
@@ -83,20 +84,23 @@ class EmailService:
                 # attachment doit être un tuple (filename, content, mimetype)
                 email.attach(*attachment)
             
-            # DEBUG: Log avant envoi
+            # Logs détaillés pour le diagnostic
             logger.info("Tentative d'envoi email: %s à %s", subject, recipient_list)
             logger.info("From: %s, Template: %s", from_email, template_name)
-            
-            # AJOUT: Log des paramètres SMTP
             logger.info("Paramètres SMTP: HOST=%s, PORT=%s, USER=%s, TLS=%s, SSL=%s", 
                        settings.EMAIL_HOST, settings.EMAIL_PORT, settings.EMAIL_HOST_USER, 
                        settings.EMAIL_USE_TLS, settings.EMAIL_USE_SSL)
             
-            # Envoyer
+            # CORRECTION CRITIQUE : Vérifier le vrai résultat d'envoi
             result = email.send(fail_silently=fail_silently)
             
-            logger.info("Email envoyé avec succès: %s à %s, résultat: %s", subject, recipient_list, result)
-            return True
+            # CORRECTION : Vérifier que l'email est bien envoyé (result == 1)
+            if result == 1:
+                logger.info("Email envoyé avec succès: %s à %s", subject, recipient_list)
+                return True
+            else:
+                logger.error("Échec envoi email: %s à %s - Résultat SMTP: %s", subject, recipient_list, result)
+                return False
             
         except Exception as e:
             logger.error("Erreur lors de l'envoi de l'email: %s", str(e), exc_info=True)
@@ -131,7 +135,7 @@ class EmailService:
                 logger.error("Erreur chargement template: %s", template_error)
                 # Continuer malgré l'erreur de template pour ne pas bloquer la commande
             
-            # ✅ CORRECTION CRITIQUE : Génération PDF non-bloquante
+            # Génération PDF non-bloquante
             attachment = None
             try:
                 # Utiliser la fonction bytes directement (pas de HttpResponse)
@@ -161,7 +165,7 @@ class EmailService:
             if result:
                 logger.info("Email de confirmation envoyé avec succès pour %s", order.order_number)
             else:
-                logger.error("Échec silencieux de l'envoi email pour %s", order.order_number)
+                logger.error("Échec de l'envoi d'email pour %s", order.order_number)
             
             return result
             
