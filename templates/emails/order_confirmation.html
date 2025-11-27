@@ -67,8 +67,6 @@
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
         }
         
         .order-number {
@@ -188,10 +186,6 @@
             border-radius: 4px;
         }
         
-        .invoice-notice strong {
-            color: #2c3e50;
-        }
-        
         .cta-button {
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -280,7 +274,13 @@
             
             <!-- MESSAGE DE BIENVENUE -->
             <div class="section">
-                <p>Bonjour <strong>{% if customer.user.first_name %}{{ customer.user.get_full_name }}{% else %}{{ customer.user.username }}{% endif %}</strong>,</p>
+                <p>Bonjour <strong>
+                    {% if customer.user.first_name %}
+                        {{ customer.user.get_full_name }}
+                    {% else %}
+                        {{ customer.user.username }}
+                    {% endif %}
+                </strong>,</p>
                 <p>Votre commande a été confirmée avec succès. Nous vous remercions pour votre confiance et vous tiendrons informé de son avancement.</p>
             </div>
             
@@ -290,6 +290,7 @@
                     Détails de votre commande
                 </div>
                 
+                {% if items %}
                 <table class="items-table">
                     <thead>
                         <tr>
@@ -303,14 +304,14 @@
                         {% for item in items %}
                         <tr>
                             <td>
-                                <div class="product-name">{{ item.product_name }}</div>
-                                {% if item.variant_details %}
-                                <div class="variant-details">{{ item.variant_details }}</div>
+                                <div class="product-name">{{ item.product.name }}</div>
+                                {% if item.variant %}
+                                <div class="variant-details">{{ item.variant.display_name }}</div>
                                 {% endif %}
                             </td>
                             <td class="text-right">{{ item.unit_price|floatformat:0 }} FCFA</td>
                             <td class="text-right">{{ item.quantity }}</td>
-                            <td class="text-right">{{ item.subtotal|floatformat:0 }} FCFA</td>
+                            <td class="text-right">{{ item.get_total|floatformat:0 }} FCFA</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -332,12 +333,6 @@
                             {% endif %}
                         </td>
                     </tr>
-                    {% if order.tax_amount and order.tax_amount > 0 %}
-                    <tr>
-                        <td class="label">Taxes :</td>
-                        <td class="amount">{{ order.tax_amount|floatformat:0 }} FCFA</td>
-                    </tr>
-                    {% endif %}
                     {% if order.discount_amount and order.discount_amount > 0 %}
                     <tr>
                         <td class="label">Réduction :</td>
@@ -349,6 +344,9 @@
                         <td class="amount">{{ order.total|floatformat:0 }} FCFA</td>
                     </tr>
                 </table>
+                {% else %}
+                <p>Aucun article dans cette commande.</p>
+                {% endif %}
             </div>
             
             <!-- INFORMATIONS DE LIVRAISON -->
@@ -362,9 +360,11 @@
                     {% if shipping_address.address_line2 %}
                     {{ shipping_address.address_line2 }}<br>
                     {% endif %}
-                    {{ shipping_address.city }}{% if shipping_address.postal_code %}, {{ shipping_address.postal_code }}{% endif %}<br>
-                    {{ shipping_address.country }}<br>
+                    {{ shipping_address.postal_code }} {{ shipping_address.city }}<br>
+                    {{ shipping_address.country.name }}<br>
+                    {% if shipping_address.phone %}
                     Tel: {{ shipping_address.phone }}
+                    {% endif %}
                 </div>
             </div>
             
@@ -375,19 +375,7 @@
                 </div>
                 <p>
                     <strong>Méthode :</strong> 
-                    {% if order.payment_method == 'cod' %}
-                        Paiement à la livraison (espèces)
-                    {% elif order.payment_method == 'airtel' %}
-                        Airtel Money
-                    {% elif order.payment_method == 'moov' %}
-                        Moov Money
-                    {% elif order.payment_method == 'card' %}
-                        Carte bancaire
-                    {% elif order.payment_method == 'bank_transfer' %}
-                        Virement bancaire
-                    {% else %}
-                        {{ order.payment_method|title }}
-                    {% endif %}
+                    {{ order.get_payment_method_display }}
                 </p>
                 <p>
                     <strong>Statut :</strong> 
@@ -406,21 +394,13 @@
                 Conservez-la pour vos archives et pour toute réclamation.
             </div>
             
-            <!-- APPEL À L'ACTION -->
-            <div class="section text-center">
-                <p>Vous pouvez suivre l'avancement de votre commande dans votre espace client :</p>
-                <a href="{{ shop_website }}/account/orders/{{ order.order_number }}/" class="cta-button">
-                    Voir ma commande
-                </a>
-            </div>
-            
             <!-- INFORMATIONS SUPPLÉMENTAIRES -->
             <div class="section">
                 <div class="section-title">
                     Informations importantes
                 </div>
                 <ul style="padding-left: 20px; margin: 10px 0;">
-                    <li>Délai de livraison estimé : 2-5 jours ouvrables</li>
+                    <li>Délai de livraison estimé : {{ order.shipping_zone.standard_delivery_days_min }}-{{ order.shipping_zone.standard_delivery_days_max }} jours ouvrables</li>
                     <li>Un numéro de suivi vous sera envoyé lorsque votre colis sera expédié</li>
                     <li>Pour toute question, contactez-nous au {{ shop_phone }}</li>
                 </ul>
@@ -435,20 +415,6 @@
                 Tel: {{ shop_phone }} | Email: {{ shop_email }}<br>
                 Web: {{ shop_website }}
             </div>
-            
-            {% if social_facebook or social_instagram or social_twitter %}
-            <div class="social-links">
-                {% if social_facebook %}
-                <a href="{{ social_facebook }}">Facebook</a>
-                {% endif %}
-                {% if social_instagram %}
-                <a href="{{ social_instagram }}">Instagram</a>
-                {% endif %}
-                {% if social_twitter %}
-                <a href="{{ social_twitter }}">Twitter</a>
-                {% endif %}
-            </div>
-            {% endif %}
             
             <div class="copyright">
                 &copy; {% now "Y" %} {{ shop_name }}. Tous droits réservés.
